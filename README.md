@@ -1,5 +1,11 @@
 # owntracks-php-client
-A simple self-hosted solution to record and map [Owntracks](https://owntracks.org/) [http payloads](http://owntracks.org/booklet/tech/http/).
+A simple and responsive self-hosted solution to record and map [Owntracks](https://owntracks.org/) [http payloads](http://owntracks.org/booklet/tech/http/).
+
+## Features
+* Owntracks HTTP payloads recoding into database
+* Interface to map location records
+* Responsive : accessible on mobile and tablet !
+* Calendar to select location records period
 
 ## Installation
 ### Requirements
@@ -12,9 +18,9 @@ That's it !
 ### Installation instructions
 #### PHP Client
 1. Download the source code and copy the content of the directory to your prefered location
-2. Edit the config.inc.sample.php file to setup access to your database :
+2. Edit the ```config.inc.sample.php``` file to setup access to your database and rename to ```config.inc.php``` :
 ```php
-  $_config['sql_host']          // sql server hostname
+	$_config['sql_host']          // sql server hostname
 	$_config['sql_user']          // sql server username
 	$_config['sql_pass']          // sql server username password
 	$_config['sql_db']            // database name
@@ -23,7 +29,7 @@ That's it !
 	
 	$_config['default_accuracy']  // default maxymum accuracy for location record to be displayed on the map
 ```
-3. Create datatable using schema.sql in the 'sql' directory
+3. Create datatable using schema.sql (in the 'sql' directory)
 
 #### Owntracks app
 Follow [Owntracks Booklet](http://owntracks.org/booklet/features/settings/) to setup your Owntracks app :
