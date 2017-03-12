@@ -39,13 +39,14 @@ if ($data['_type'] == 'location') {
 
 		$geo_decode_json = file_get_contents($geo_decode_url);		
 
-		$geo_decode = json_decode($geo_decode_json);
+		$geo_decode = @json_decode($geo_decode_json, true);
+
 	
 		$place_id = intval($geo_decode['place_id']);
 		$osm_id = intval($geo_decode['osm_id']);
 		$display_name = strval($geo_decode['display_name']);
 		
-		if($display_name == '') { $display_name = json_encode($geo_decode); }
+		if($display_name == '') { $display_name = @json_encode($geo_decode); }
 
 	}
 	
