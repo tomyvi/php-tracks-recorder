@@ -1,4 +1,5 @@
 config.inc.php
+geo_decode.php
 
 # Windows image file caches
 Thumbs.db
