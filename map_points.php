@@ -16,8 +16,10 @@
         $_GET['dateTo'] = date("Y-m-d");
     }
 
-    if(!array_key_exists('accuracy', $_GET)){
-        $_GET['accuracy'] = $_config['default_accuracy'];
+    if(array_key_exists('accuracy', $_GET) && $_GET['accuracy'] > 0){
+        $accuracy = intVal($_GET['accuracy']);
+    }else{
+        $accuracy = $_config['default_accuracy'];
     }
 
     $time_from = strptime($_GET['dateFrom'], '%Y-%m-%d');
@@ -28,10 +30,15 @@
     $time_to = mktime(23, 59, 59, $time_to['tm_mon']+1, $time_to['tm_mday'], $time_to['tm_year']+1900);
     //$time_to = strtotime('+1 day', $time_to);
 
-	$sql = "SELECT * FROM ".$_config['sql_prefix']."locations WHERE epoch >= $time_from AND epoch <= $time_to AND accuracy < ".$_GET['accuracy']." AND altitude >=0 ORDER BY epoch ASC";
+	$sql = "SELECT * FROM ".$_config['sql_prefix']."locations WHERE epoch >= $time_from AND epoch <= $time_to AND accuracy < ".$accuracy." AND altitude >=0 ORDER BY epoch ASC";
     echo "//$sql\n\n";
 
     $stmt = $mysqli->prepare($sql);
+
+    if(!$stmt){
+        echo $mysqli->error;
+    }
+
 	$stmt->execute();
 	$result = $stmt->get_result();
 	$stmt->store_result();
