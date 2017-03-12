@@ -1,11 +1,14 @@
 <?php
-setlocale(LC_TIME, "fr_FR");
+
+require_once('./config.inc.php');
+
 $dateFrom = isset($_GET['dateFrom']) ? $_GET['dateFrom'] : date('Y-m-d');
 $dateTo = isset($_GET['dateTo']) ? $_GET['dateTo'] : date('Y-m-d');
 
-if(isset($_GET['accuracy'])){
+
+if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy']) > 0){
 	$accuracy = intval($_GET['accuracy']);
-}else if(isset($_COOKIE['accuracy'])){
+}else if(isset($_COOKIE['accuracy']) && $_COOKIE['accuracy'] != '' && intval($_COOKIE['accuracy']) > 0){
 	$accuracy = intval($_COOKIE['accuracy']);
 }else{
 	$accuracy = $_config['default_accuracy'];
@@ -160,6 +163,7 @@ if(isset($_GET['accuracy'])){
 					dateTo = moment('<?php echo $dateTo; ?>');
 					dateFrom = moment('<?php echo $dateFrom; ?>');
 					accuracy = <?php echo $accuracy; ?>;
+
 					console.log("dateFrom = "+dateFrom.format('YYYY-MM-DD')+ '/' +dateFrom.format('X'));
 					console.log("dateTo = "+dateTo.format('YYYY-MM-DD')+ '/' +dateTo.format('X'));
 					console.log('accuracy = ' + accuracy);
