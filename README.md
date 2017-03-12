@@ -35,6 +35,9 @@ That's it !
 	$_config['sql_prefix']        // table prefix
 	
 	$_config['default_accuracy']  // default maxymum accuracy for location record to be displayed on the map
+	
+	$_config['enable_geo_reverse'] // set to TRUE to enable geo decoding of location records
+	$_config['geo_reverse_lookup_url'] // geodecoding api url, will be appended with lat= & lon= attributes 
 ```
 3. Create datatable using schema.sql (in the 'sql' directory)
 
