@@ -16,7 +16,8 @@
         $_GET['dateTo'] = date("Y-m-d");
     }
 
-    if(!array_key_exists('accuracy', $_GET)){
+    if(!array_key_exists('accuracy', $_GET) || $_GET['accuracy']==''){
+
         $_GET['accuracy'] = $_config['default_accuracy'];
     }
 
@@ -28,19 +29,19 @@
     $time_to = mktime(23, 59, 59, $time_to['tm_mon']+1, $time_to['tm_mday'], $time_to['tm_year']+1900);
     //$time_to = strtotime('+1 day', $time_to);
 
-	$sql = "SELECT * FROM ".$_config['sql_prefix']."locations WHERE epoch >= $time_from AND epoch <= $time_to AND accuracy < ".$_GET['accuracy']." AND altitude >=0 ORDER BY epoch ASC";
+	$sql = "SELECT * FROM ".$_config['sql_prefix']."locations WHERE epoch >= $time_from AND epoch <= $time_to AND accuracy < ".$_GET['accuracy']." ORDER BY epoch ASC";
     echo "//$sql\n\n";
 
     $stmt = $mysqli->prepare($sql);
 	$stmt->execute();
 	$result = $stmt->get_result();
 	$stmt->store_result();
-    
-    while($data = $result->fetch_assoc()){ 
-        //Loop through results here $data[] 
+
+    while($data = $result->fetch_assoc()){
+        //Loop through results here $data[]
         $markers[] = $data;
     }
-    
+
     $stmt->close();
     print "markers = ".json_encode($markers).";";
 ?>
