@@ -39,8 +39,6 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 		
 		<script src="./js/js.cookie.js"></script>
 		
-		<script src="./map_points.php?dateFrom=<?php echo $dateFrom; ?>&dateTo=<?php echo $dateTo; ?>&accuracy=<?php echo $accuracy; ?>"></script>
-		
 		<!-- BOOTSTRAP !-->
 		<link rel="stylesheet" href="./css/bootstrap.min.css" />
 		<link rel="stylesheet" href="./css/bootstrap-theme.min.css" />
@@ -109,7 +107,13 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 							<span class="visible-xs"><span class="glyphicon glyphicon-map-marker"></span></span>
 						</a>
 					</div>
-					<div class="col-xs-10 text-right">	
+					<div class="col-xs-2 text-left">
+					  	<a href="javascript:setLiveMap();" class="btn btn-default" id="livemap_on">
+							<span class="hidden-xs">Live map</span>
+							<span class="visible-xs"><span class="glyphicon glyphicon-play-circle"></span></span>
+						</a>
+					</div>
+					<div class="col-xs-8 text-right">	
 						<form class="form-inline"><span class="hidden-xs">Accuracy : </span>
 						    <div class="input-group">
 						      <input type="number" size='4' class="form-control" id="accuracy" value="<?echo $accuracy; ?>" />
@@ -164,23 +168,14 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 					dateFrom = moment('<?php echo $dateFrom; ?>');
 					accuracy = <?php echo $accuracy; ?>;
 
-					console.log("dateFrom = "+dateFrom.format('YYYY-MM-DD')+ '/' +dateFrom.format('X'));
-					console.log("dateTo = "+dateTo.format('YYYY-MM-DD')+ '/' +dateTo.format('X'));
-					console.log('accuracy = ' + accuracy);
-
 					diff = dateTo.diff(dateFrom, 'days');
 					//if(dateTo.isSame(dateFrom)){ diff = diff+1; }
-					console.log("Diff = "+diff);
 					
 					datePrevTo = moment(dateFrom).subtract(1, 'days');;
 					datePrevFrom = moment(datePrevTo).subtract(diff, 'days');
-					console.log("datePrevFrom = "+datePrevFrom.format('YYYY-MM-DD'));
-					console.log("datePrevTo = "+datePrevTo.format('YYYY-MM-DD'));
 					
 					dateNextFrom = moment(dateTo).add(1, 'days');
 					dateNextTo = moment(dateNextFrom).add(diff, 'days');
-					console.log("dateNextFrom = "+dateNextFrom.format('YYYY-MM-DD'));
-					console.log("dateNextTo = "+dateNextTo.format('YYYY-MM-DD'));
 					
 					//disable Next button
 					if(dateNextFrom.isAfter(moment())){
@@ -190,6 +185,8 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 					//disable today button
 					if(dateNextFrom.isSame(moment())){
 						$('#todayButton').addClass('disabled');
+					}else{
+						$('#livemap_on').addClass('disabled');
 					}
 					
 					$('.input-daterange').datepicker({
@@ -199,14 +196,11 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 					});
 					
 					$('.input-daterange').datepicker().on('hide', function(e) {
-				        
 				        return gotoDate($('#dateFrom').val(), $('#dateTo').val());
-				        
 				    });
 				});
 				
 				$('#accuracy').change(function(){
-					
 					gotoAccuracy();
 				});
 				$('#accuracySubmit').click(function(){
@@ -236,6 +230,8 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 				var polyline;
 				var default_zoom;
 				var default_center;
+				var live_view = false;
+				var live_view_timer;
 				
 				$( document ).ready(function() {
 					
@@ -255,15 +251,53 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 					    subdomains: ['a','b','c']
 					}).addTo( mymap );
 					
-					//
-					drawMap(markers);
+					getMarkers();
+					
+					
+					
+					
 					
 					//wait 1 second before reading current zoom and location
 					setTimeout(function() {
 						default_zoom = mymap.getZoom();
 						default_center = mymap.getCenter();
-					}, 1000);
+					}, 5000);
 				});
+				
+				function getMarkers(){
+					
+					//ajax call to get list of markers
+					$.ajax({ 
+				        url: 'rpc.php',
+				        data: {
+				        	'dateFrom': dateFrom.format('YYYY-MM-DD'),
+				        	'dateTo': dateTo.format('YYYY-MM-DD'),
+				        	'accuracy': accuracy,
+				        	'action': 'getMarkers'
+				        },
+				        type: 'get',
+        				dataType: 'json',
+				        success: function(data, status)
+				        {
+				            if(data.status){
+						        //removing element from JS array
+								markers = JSON.parse(data.markers);
+								
+								eraseMap();
+								drawMap(markers);
+								
+				        	}else{
+				        		console.log("Status : " + status);
+				        		console.log("Data : " + data);
+				        	}
+				        },
+				        error: function(xhr, desc, err) {
+					        console.log(xhr);
+					        console.log("Details: " + desc + "\nError:" + err);
+				        }
+				    });
+					
+				}
 				
 				function drawMap(markers){
 					
@@ -281,18 +315,23 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 							var accuracyString = '<br/>Accuracy : ' + markers[i].accuracy + ' m';
 							var headingString = "";
 							var velocityString = "";
+							var locationString = "";
 							if(markers[i].heading != null) headingString = '<br/>Heading : ' + markers[i].heading + ' °';
 							if(markers[i].velocity != null) velocityString = '<br/>Velocity : ' + markers[i].velocity + ' km/h';
+							if(markers[i].display_name != null) locationString = "<br/>Location : <a href='javascript:showBoundingBox("+ i +");' title='Show location bounding box' >" + markers[i].display_name + '</a>';
 							
 							removeString = "<br/><br/><a href='javascript:removeMarker("+ i +");'>Delete</a>";
 							
-							popupString = dateString + accuracyString + headingString + velocityString + removeString;
+							popupString = dateString + accuracyString + headingString + velocityString + locationString + removeString;
 						   
 					   		my_marker = L.marker( [markers[i].latitude, markers[i].longitude] ).bindPopup(popupString);
 					   		
 					   		//display marker only if cookie says to
 					   		if(markers_set != '0' || i == 0 || i == markers.length-1){
 					   			my_marker.addTo( mymap );					   			
+					   		}
+					   		if(i == markers.length-1){
+					   			my_marker.addTo( mymap ).openPopup();;					   			
 					   		}
 					   		my_latlngs[i] = [markers[i].latitude, markers[i].longitude, i];
 					   		
@@ -310,6 +349,9 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 						   my_markers[i] = my_marker;
 						   
 						}
+						
+						var group = new L.featureGroup(my_markers);
+			 			mymap.fitBounds(group.getBounds());
 					
 						//var polyline = L.polyline(my_latlngs).addTo(mymap);
 						polyline = L.hotline(my_latlngs, {
@@ -325,8 +367,7 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 								outlineWidth: 0.5
 						}).addTo(mymap);
 					
-						var group = new L.featureGroup(my_markers);
-			 			mymap.fitBounds(group.getBounds());
+						
 
 					}	
 					
@@ -334,9 +375,25 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 				}
 				
 				function eraseMap(){
-					polyline.removeFrom(mymap);
+					if (polyline != null){
+					    polyline.removeFrom(mymap);
+					}
+					
 					hideMarkers();
 					return true;
+				}
+				
+				function setLiveMap(){
+					live_view = !live_view;
+					
+					if(live_view){
+						live_view_timer = setTimeout(getMarkers(), 3000);
+						$('#livemap_on').removeClass( "btn-default" ).addClass( "btn-primary" ).addClass( "active" );
+						
+					}else{
+						clearTimeout(live_view_timer);
+						$('#livemap_on').addClass( "btn-default" ).removeClass( "btn-primary" ).removeClass( "active" );
+					}
 				}
 				
 				//map manipulation
@@ -348,9 +405,11 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 					return true;
 				}
 				function hideMarkers(){
-					for ( var i=1; i < markers.length-1; ++i ) 
-					{
-					   my_markers[i].remove();
+					if(markers.length == my_markers.length){
+						for ( var i=1; i < markers.length-1; ++i ) 
+						{
+						   my_markers[i].remove();
+						}
 					}
 					return true;
 				}
@@ -386,9 +445,7 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 	        				dataType: 'json',
 					        success: function(data, status)
 					        {
-					            console.log(data);
-					        	
-					        	if(data.status){
+					            if(data.status){
 							        //removing element from JS array
 									markers.splice(i, 1);
 									
@@ -406,6 +463,12 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 					        }
 					    });
 					}
+				}
+				
+				function showBoundingBox(i){
+					
+					
+					
 				}
 				
 				//zoom manipulation
