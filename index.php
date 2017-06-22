@@ -282,8 +282,8 @@ if(isset($_GET['accuracy'])){
 							if(markers[i].velocity != null) velocityString = '<br/>Velocity : ' + markers[i].velocity + ' km/h';
 
 							removeString = "<br/><br/><a href='javascript:removeMarker("+ i +");'>Delete</a>";
-
-							popupString = dateString + accuracyString + headingString + velocityString + removeString;
+							 addressString = "<br/><a href='http:\/\/nominatim.openstreetmap.org/reverse?format=xml&lat=" + markers[i].latitude + "&lon=" + markers[i].longitude + "'>Address</a>";
+							popupString = dateString + accuracyString + addressString + headingString + velocityString + removeString;
 
 					   		my_marker = L.marker( [markers[i].latitude, markers[i].longitude] ).bindPopup(popupString);
 
