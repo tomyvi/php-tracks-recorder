@@ -31,13 +31,25 @@
 		if (array_key_exists('vel', $data)) $velocity = $data['vel'];
 		if (array_key_exists('p', $data)) $pressure = $data['p'];
 		if (array_key_exists('conn', $data)) $connection = $data['conn'];
+		
+		if ($epoch)
+		{
+			$dt = new DateTime("@$epoch");  // convert UNIX timestamp to PHP DateTime
+			$timestamp = $dt->format('Y-m-d H:i:s'); // output = 2017-01-01 00:00:00
+		}
 
-        $sql = "INSERT INTO " . $_config['sql_prefix'] . "locations (accuracy, altitude, battery_level, heading, description, event, latitude, longitude, radius, trig, tracker_id, epoch, vertical_accuracy, velocity, pressure, connection) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $mysqli->prepare($sql);
-        # bind parameters (s = string, i = integer, d = double,  b = blob)
-        $stmt->bind_param('iiiissddisssiids', $accuracy, $altitude, $battery_level, $heading, $description, $event, $latitude, $longitude, $radius, $trig, $tracker_id, $epoch, $vertical_accuracy, $velocity, $pressure, $connection);
-        $stmt->execute();
-        $stmt->close();
+
+		$sql = "INSERT INTO ".$_config['sql_prefix']."locations (dt, accuracy, altitude, battery_level, heading, description, event, latitude, longitude, radius, trig, tracker_id, epoch, vertical_accuracy, velocity, pressure, connection) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        if ($stmt = $mysqli->prepare($sql))
+		{
+			# bind parameters (s = string, i = integer, d = double,  b = blob)
+			$stmt->bind_param('siiiissddisssiids', $timestamp, $accuracy, $altitude, $battery_level, $heading, $description, $event, $latitude, $longitude, $radius, $trig, $tracker_id, $epoch, $vertical_accuracy, $velocity, $pressure, $connection);
+			$stmt->execute();
+			$stmt->close();
+		}else{
+			die("Can't write to database");
+		}
+
     }
 
     $response = array();
