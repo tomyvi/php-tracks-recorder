@@ -275,7 +275,7 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 				        	'accuracy': accuracy,
 				        	'action': 'getMarkers'
 				        },
-				        type: 'get',
+				        type: 'GET',
         				dataType: 'json',
 				        success: function(data, status)
 				        {
@@ -318,9 +318,13 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 							var locationString = "";
 							if(markers[i].heading != null) headingString = '<br/>Heading : ' + markers[i].heading + ' °';
 							if(markers[i].velocity != null) velocityString = '<br/>Velocity : ' + markers[i].velocity + ' km/h';
-							if(markers[i].display_name != null) locationString = "<br/>Location : <a href='javascript:showBoundingBox("+ i +");' title='Show location bounding box' >" + markers[i].display_name + '</a>';
+							if(markers[i].display_name != null){
+								locationString = "<br/>Location : <a href='javascript:showBoundingBox("+ i +");' title='Show location bounding box' >" + markers[i].display_name + '</a>';
+							}else{
+								locationString = "<br/>Location : <span id='loc_"+ i +"'><a href='javascript:geodecodeMarker("+ i +");' title='Get location (geodecode)'>Get location</a></span>";
+							}
 							
-							removeString = "<br/><br/><a href='javascript:removeMarker("+ i +");'>Delete</a>";
+							removeString = "<br/><br/><a href='javascript:removeMarker("+ i +");'>Delete marker</a>";
 							
 							popupString = dateString + accuracyString + headingString + velocityString + locationString + removeString;
 						   
@@ -428,6 +432,42 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 					}
 				}
 				
+				function geodecodeMarker(i){
+					
+					console.log("Geodecoding marker #" + i);
+						
+					//ajax call to remove marker from backend
+					$.ajax({ 
+				        url: 'rpc.php',
+				        data: {
+				        	'epoch': markers[i].epoch,
+				        	'action': 'geoDecode'
+				        },
+				        type: 'get',
+        				dataType: 'json',
+				        success: function(data, status)
+				        {
+				            if(data.status){
+				            	
+				            	console.log("Status : " + status);
+				        		console.log("Data : " + data);
+				        		
+						        //update marker data
+						        $('#loc_'+i).html("<a href='javascript:showBoundingBox("+ i +");' title='Show location bounding box' >" + data.location + "</a>");
+								
+				        	}else{
+				        		console.log("Status : " + status);
+				        		console.log("Data : " + data);
+				        	}
+				        },
+				        error: function(xhr, desc, err) {
+					        console.log(xhr);
+					        console.log("Details: " + desc + "\nError:" + err);
+				        }
+				    });
+					
+				}
+				
 				function removeMarker(i){
 					
 					
@@ -441,7 +481,7 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 					        	'epoch': markers[i].epoch,
 					        	'action': 'removeMarker'
 					        },
-					        type: 'post',
+					        type: 'get',
 	        				dataType: 'json',
 					        success: function(data, status)
 					        {

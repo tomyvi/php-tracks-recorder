@@ -33,8 +33,9 @@ if ($data['_type'] == 'location') {
 	if (array_key_exists('p', $data)) $pressure = floatval($data['p']);
 	if (array_key_exists('conn', $data)) $connection = strval($data['conn']);
 	
-
+	/*
 	if($_config['enable_geo_reverse']){
+		
 		$geo_decode_url = $_config['geo_reverse_lookup_url'] . 'lat=' .$latitude. '&lon='.$longitude;
 
 		$geo_decode_json = file_get_contents($geo_decode_url);		
@@ -49,17 +50,27 @@ if ($data['_type'] == 'location') {
 		if($display_name == '') { $display_name = @json_encode($geo_decode); }
 
 	}
+	*/
 	
+    $sql = "INSERT INTO ".$_config['sql_prefix']."locations (accuracy, altitude, battery_level, heading, description, event, latitude, longitude, radius, trig, tracker_id, epoch, vertical_accuracy, velocity, pressure, connection, place_id, osm_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    
+    if ($stmt = $mysqli->prepare($sql)){
+    	
+    	# bind parameters (s = string, i = integer, d = double,  b = blob)
+	    $stmt->bind_param('iiiissddissiiidsii', $accuracy, $altitude, $battery_level, $heading, $description, $event, $latitude, $longitude, $radius, $trig, $tracker_id, $epoch, $vertical_accuracy, $velocity, $pressure, $connection, $place_id, $osm_id);
+	    $stmt->execute();
+	    $stmt->close();
+	    http_response_code(200);
 	
-    $sql = "INSERT INTO log_locations (accuracy, altitude, battery_level, heading, description, event, latitude, longitude, radius, trig, tracker_id, epoch, vertical_accuracy, velocity, pressure, connection, place_id, osm_id, display_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $mysqli->prepare($sql);
+    }else{
+		http_response_code(500);
+		die("Can't write to database");
+	}
 
     
 
-    # bind parameters (s = string, i = integer, d = double,  b = blob)
-    $stmt->bind_param('iiiissddissiiidsiis', $accuracy, $altitude, $battery_level, $heading, $description, $event, $latitude, $longitude, $radius, $trig, $tracker_id, $epoch, $vertical_accuracy, $velocity, $pressure, $connection, $place_id, $osm_id, $display_name);
-    $stmt->execute();
-    $stmt->close();
+}else{
+	http_response_code(204);
 }
 
 $response = array();
