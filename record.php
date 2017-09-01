@@ -52,25 +52,51 @@ if ($data['_type'] == 'location') {
 	}
 	*/
 	
-    $sql = "INSERT INTO ".$_config['sql_prefix']."locations (accuracy, altitude, battery_level, heading, description, event, latitude, longitude, radius, trig, tracker_id, epoch, vertical_accuracy, velocity, pressure, connection, place_id, osm_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    
-    if ($stmt = $mysqli->prepare($sql)){
+	$sql = "SELECT epoch FROM ".$_config['sql_prefix']."locations WHERE tracker_id = ? AND epoch = ?";
+
+	if ($stmt = $mysqli->prepare($sql)){
     	
-    	# bind parameters (s = string, i = integer, d = double,  b = blob)
-	    $stmt->bind_param('iiiissddissiiidsii', $accuracy, $altitude, $battery_level, $heading, $description, $event, $latitude, $longitude, $radius, $trig, $tracker_id, $epoch, $vertical_accuracy, $velocity, $pressure, $connection, $place_id, $osm_id);
-	    $stmt->execute();
+    	$stmt->bind_param('si', $tracker_id, $epoch);
+    	$stmt->execute();
+		$stmt->store_result();
+
+
+	    //record only if same data found at same epoch / tracker_id
+	    if($stmt->num_rows == 0) {
+
+			$sql = "INSERT INTO ".$_config['sql_prefix']."locations (accuracy, altitude, battery_level, heading, description, event, latitude, longitude, radius, trig, tracker_id, epoch, vertical_accuracy, velocity, pressure, connection, place_id, osm_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		    
+		    if ($stmt = $mysqli->prepare($sql)){
+		    	
+		    	# bind parameters (s = string, i = integer, d = double,  b = blob)
+			    $stmt->bind_param('iiiissddissiiidsii', $accuracy, $altitude, $battery_level, $heading, $description, $event, $latitude, $longitude, $radius, $trig, $tracker_id, $epoch, $vertical_accuracy, $velocity, $pressure, $connection, $place_id, $osm_id);
+			    $stmt->execute();
+			    http_response_code(200);
+				$response['msg'] = "OK record saved";
+			
+		    }else{
+				http_response_code(500);
+				die("Can't write to database");
+				$response['msg'] = "Can't write to database";
+			}
+
+	    }
 	    $stmt->close();
-	    http_response_code(200);
 	
     }else{
 		http_response_code(500);
-		die("Can't write to database");
+		die("Can't read from database");
+		$response['msg'] = "Can't read from database";
 	}
+
+
+    
 
     
 
 }else{
 	http_response_code(204);
+	$response['msg'] = "OK type is not location";
 }
 
 $response = array();
