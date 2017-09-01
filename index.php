@@ -539,7 +539,7 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 											locationString = "<br/>Location : <span id='loc_"+ i +"'><a href='javascript:geodecodeMarker("+ i +");' title='Get location (geodecode)'>Get location</a></span>";
 										}
 										
-										removeString = "<br/><br/><a href='javascript:removeMarker("+ i +");'>Delete marker</a>";
+										removeString = "<br/><br/><a href=\"javascript:deleteMarker('"+ tid +"', "+ i +");\">Delete marker</a>";
 										
 										//prepare popup HTML code for marker
 										popupString = dateString + trackerIDString + accuracyString + headingString + velocityString + locationString + removeString;
@@ -787,7 +787,7 @@ console.log(_index2);
 				* Adds two numbers
 				* @param {Number} a 
 				*/
-				function deleteMarker(i){
+				function deleteMarker(tid, i){
 					
 					
 					if(confirm('Do you really want to permanently delete marker ?')){
@@ -797,7 +797,7 @@ console.log(_index2);
 						$.ajax({ 
 					        url: 'rpc.php',
 					        data: {
-					        	'epoch': markers[i].epoch,
+					        	'epoch': tid_markers[tid][i].epoch,
 					        	'action': 'deleteMarker'
 					        },
 					        type: 'get',
@@ -806,11 +806,11 @@ console.log(_index2);
 					        {
 					            if(data.status){
 							        //removing element from JS array
-									markers.splice(i, 1);
+									tid_markers[tid].splice(i, 1);
 									
 									//redraw map from scratch
 									eraseMap();
-									drawMap(markers);
+									drawMap();
 					        	}else{
 					        		console.log("Status : " + status);
 					        		console.log("Data : " + data);
