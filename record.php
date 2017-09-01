@@ -38,6 +38,7 @@
 			$timestamp = $dt->format('Y-m-d H:i:s'); // output = 2017-01-01 00:00:00
 		}
 
+
 		$sql = "INSERT INTO ".$_config['sql_prefix']."locations (dt, accuracy, altitude, battery_level, heading, description, event, latitude, longitude, radius, trig, tracker_id, epoch, vertical_accuracy, velocity, pressure, connection) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         if ($stmt = $mysqli->prepare($sql))
 		{
@@ -48,6 +49,7 @@
 		}else{
 			die("Can't write to database");
 		}
+
     }
 
     $response = array();
