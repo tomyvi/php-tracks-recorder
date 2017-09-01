@@ -11,6 +11,7 @@ A simple and responsive self-hosted solution to record and map [Owntracks](https
 ## Features
 * Owntracks HTTP payloads recoding into database
 * Interface to map location records
+* Multiple tracking of devices using Owntracks TrackerID info from payload
 * Responsive : accessible on mobile and tablet !
 * Calendar to select location records period
 
@@ -43,7 +44,8 @@ Follow [Owntracks Booklet](http://owntracks.org/booklet/features/settings/) to s
 
 1. Setup your Owntracks app :
   1. Mode : HTTP
-  2. URL : http://your_host/your_dir/record.php
+  2. TrackerID : define one for each device (2 letters)
+  3. URL : http://your_host/your_dir/record.php
   
 ## Usage
 ### First time access
@@ -56,6 +58,7 @@ Access map of today's recorded locations at : http://your_host/your_dir/
 ### Adjust map settings
 * Use the "Config" button to :
   * Display or hide the individual markers (first and last markers for the period will always be displayed)
+  * Select which trackerID to display (list based on trackerIDs found in database for selected period of time)
   * Change maximum accuracy for displayed location records
 
 ## Contributing
@@ -69,7 +72,8 @@ I'd really like for you to bring a few more people along to join in.
 * [Bootstrap-Datepicker](https://eonasdan.github.io/bootstrap-datetimepicker/) : 
 * [MomentJS](https://momentjs.com/) : Full featured date library for parsing, validating, manipulating, and formatting dates
 * [LeafletJS](http://leafletjs.com/) : an open-source JavaScript library for mobile-friendly interactive maps
-* [Leaflet Hotline](https://iosphere.github.io/Leaflet.hotline/) : A Leaflet plugin for drawing colored gradients along polylines.
+* [Leaflet Hotline](https://iosphere.github.io/Leaflet.hotline/) : A Leaflet plugin for drawing colored gradients along polylines
+* [Leaflet Awesome Markers](https://github.com/lvoogdt/Leaflet.awesome-markers) : A Leaflet plugin for customizing marker icon
 * [js-cookie](https://github.com/js-cookie/js-cookie) : A simple, lightweight JavaScript API for handling browser cookies
 
 ## License
