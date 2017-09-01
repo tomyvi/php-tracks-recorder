@@ -321,7 +321,7 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 				var my_marker;
 				var my_markers = [];
 				var my_latlngs = [];
-				var polyline;
+				var polylines = [];
 				var default_zoom;
 				var default_center;
 				var live_view = false;
@@ -420,7 +420,8 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 				        	'dateFrom': dateFrom.format('YYYY-MM-DD'),
 				        	'dateTo': dateTo.format('YYYY-MM-DD'),
 				        	'accuracy': accuracy,
-				        	'trackerID' : trackerID,
+				        	//'trackerID' : trackerID,
+				        	//'epoc': time(),
 				        	'action': 'getMarkers'
 				        },
 				        type: 'GET',
@@ -590,25 +591,32 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 									   my_markers[tid][i] = my_marker;
 									   
 									}
+
+									//var polylines[tid] = L.polyline(my_latlngs[tid]).addTo(mymap);
+									polylines[tid] = L.hotline(my_latlngs[tid], {
+											min: 0,
+											max: markers.length,
+											palette: {
+												0.0: 'green',
+												0.5: 'yellow',
+												1.0: 'red'
+											},
+											weight: 4,
+											outlineColor: '#000000',
+											outlineWidth: 0.5
+									}).addTo(mymap);
+
 								}else{
 									alert('No location data for trackerID \'' + trackerID + '\' found !');
 								}
+
+
 							}
+
+
 						}
 						
-						//var polyline = L.polyline(my_latlngs[tid]).addTo(mymap);
-						polyline = L.hotline(my_latlngs[tid], {
-								min: 0,
-								max: markers.length,
-								palette: {
-									0.0: 'green',
-									0.5: 'yellow',
-									1.0: 'red'
-								},
-								weight: 4,
-								outlineColor: '#000000',
-								outlineWidth: 0.5
-						}).addTo(mymap);
+						
 					
 						
 
@@ -633,9 +641,9 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 				*/
 				function eraseMap(){
 					
-					if (polyline != null){
-					    polyline.removeFrom(mymap);
-					}
+					$.each(trackerIDs, function(_index, _tid){
+						if(_tid in polylines) { polylines[_tid].removeFrom(mymap); }
+				    });
 					
 					$.each(trackerIDs, function(_index, _tid){
 
@@ -720,11 +728,13 @@ console.log(_index2);
 					if($('#show_markers').hasClass( "btn-default" )){
 						showMarkers();
 						Cookies.set('show_markers', 1, { expires: 365 });
+						show_markers = 1;
 						$('#show_markers').removeClass( "btn-default" ).addClass( "btn-primary" ).addClass( "active" );
 						return true;
 					}else{
 						hideMarkers();
 						Cookies.set('show_markers', 0, { expires: 365 });
+						show_markers = 0;
 						$('#show_markers').removeClass("btn-primary").removeClass("active").addClass("btn-default");
 						return true;
 					}
