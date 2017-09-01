@@ -37,7 +37,7 @@
 		    $time_to = mktime(23, 59, 59, $time_to['tm_mon']+1, $time_to['tm_mday'], $time_to['tm_year']+1900);
 		    //$time_to = strtotime('+1 day', $time_to);
 		
-			$sql = "SELECT * FROM ".$_config['sql_prefix']."locations WHERE epoch >= $time_from AND epoch <= $time_to AND accuracy < ".$accuracy." AND altitude >=0 ORDER BY epoch ASC";
+			$sql = "SELECT * FROM ".$_config['sql_prefix']."locations WHERE epoch >= $time_from AND epoch <= $time_to AND accuracy < ".$accuracy." AND altitude >=0 ORDER BY tracker_id, epoch ASC";
 		    
 		    $stmt = $mysqli->prepare($sql);
 		
@@ -51,9 +51,10 @@
 			$result = $stmt->get_result();
 			$stmt->store_result();
 		    
+		    $tracker_id = "";
 		    while($data = $result->fetch_assoc()){ 
 		        //Loop through results here $data[] 
-		        $markers[] = $data;
+		        $markers[$data['tracker_id']][] = $data;
 		    }
 		    
 		    $stmt->close();
@@ -62,7 +63,7 @@
 	    	
 	    	
 	    	
-	    }else if($_REQUEST['action'] === 'removeMarker'){
+	    }else if($_REQUEST['action'] === 'deleteMarker'){
 	    	
 	    	if(!array_key_exists('epoch', $_REQUEST)){
 	    		$response['error'] = "No epoch provided for marker removal";
@@ -154,7 +155,7 @@
 			    		$stmt->bind_param('siiidd', $location, $place_id, $osm_id, $_REQUEST['epoch'], $latitude, $longitude);
 						
 						if(!$stmt->execute()){
-							$response['error'] = "Unable to get marker from database : " . $stmt->error;
+							$response['error'] = "Unable to update marker in database : " . $stmt->error;
 							$response['status'] = false;
 							http_response_code(500);
 						}else{
