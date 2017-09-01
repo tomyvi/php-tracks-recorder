@@ -14,6 +14,7 @@ A simple and responsive self-hosted solution to record and map [Owntracks](https
 * Multiple tracking of devices using Owntracks TrackerID info from payload
 * Responsive : accessible on mobile and tablet !
 * Calendar to select location records period
+* One-page navigation (fully RPC-based)
 
 ## Installation
 ### Requirements
