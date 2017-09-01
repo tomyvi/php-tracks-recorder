@@ -14,14 +14,6 @@ if(isset($_GET['accuracy']) && $_GET['accuracy'] != '' && intval($_GET['accuracy
 	$accuracy = $_config['default_accuracy'];
 }
 
-if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['trackerID']) == 2){
-	$trackerID = $_GET['trackerID'];
-}else if(isset($_COOKIE['trackerID']) && $_COOKIE['trackerID'] != '' && strlen($_COOKIE['trackerID']) == 2){
-	$trackerID = $_COOKIE['trackerID'];
-}else{
-	$trackerID = $_config['default_trackerID'];
-}
-
 ?>
 <html>
 	<head>
@@ -44,7 +36,6 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 		<!-- LEAFLET.JS !-->
 		<script src="./js/leaflet.js"></script>
 		<script src="./js/leaflet.hotline.js"></script>
-		<script src="./js/leaflet.awesome-markers.min.js"></script>
 		
 		<script src="./js/js.cookie.js"></script>
 		
@@ -57,7 +48,6 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 				
 		<!-- LEAFLET.JS !-->
 		<link rel="stylesheet" href="./css/leaflet.css" />
-		<link rel="stylesheet" href="./css/leaflet.awesome-markers.css" />
 		
 		<style>
 			#mapid { height: 85%; }
@@ -112,7 +102,7 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 			  <div class="well">
 			  	<div class="row">
 			  		<div class="col-xs-2 text-left">
-					  	<a href="javascript:showHideMarkers();" class="btn btn-default" id="show_markers">
+					  	<a href="javascript:showHideMarkers();" class="btn btn-default" id="markers_on">
 							<span class="hidden-xs">Show markers</span>
 							<span class="visible-xs"><span class="glyphicon glyphicon-map-marker"></span></span>
 						</a>
@@ -133,82 +123,20 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 						</form>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-xs-12 text-left">
-						<div class="input-group">
-							<div class="input-group-addon">
-								<span class="hidden-xs">Tracker ID</span>
-								<span class="visible-xs"><span class="glyphicon glyphicon-user"></span></span>
-							</div>
-							<select class="form-control" name="tracker_id" id="trackerID_selector" style="">
-						    	<option value="all"><?php echo $_config['default_trackerID']; ?></option>
-
-							</select>
-						</div>
-					</div>
-				</div>
 			  </div>
 			</div>
 			<script>
 				
-				function updateDateNav(_dateFrom, _dateTo){
-
-					if(typeof _dateFrom == "undefined") { _dateFrom = dateFrom; }
-					if(typeof _dateTo == "undefined") { _dateTo = dateTo; }
-
-
-					diff = _dateTo.diff(_dateFrom, 'days');
-					//if(dateTo.isSame(dateFrom)){ diff = diff+1; }
-					
-					datePrevTo = moment(_dateFrom).subtract(1, 'days');;
-					datePrevFrom = moment(datePrevTo).subtract(diff, 'days');
-					
-					dateNextFrom = moment(_dateTo).add(1, 'days');
-					dateNextTo = moment(dateNextFrom).add(diff, 'days');
-					
-					//disable Next button
-					if(dateNextFrom.isAfter(moment())){
-						$('#nextButton').addClass('disabled');
-					}else{
-						$('#nextButton').removeClass('disabled');
-					}
-					
-					//disable today button
-					if(dateNextFrom.isSame(moment())){
-						$('#todayButton').addClass('disabled');
-						$('#livemap_on').removeClass('disabled');
-					}else{
-						$('#todayButton').removeClass('disabled');
-						$('#livemap_on').addClass('disabled');
-					}
-				}
 				
-				/**
-				* Adds two numbers
-				* @param {Number} a 
-				* @param {Number} a 
-				* @return {Number} sum
-				*/
+				//dates manipulation
 				function gotoDate(_dateFrom, _dateTo){
 					var _dateFrom = (typeof _dateFrom !== 'undefined') ? moment(_dateFrom) : moment();
 					var _dateTo = (typeof _dateTo !== 'undefined') ? moment(_dateTo) : moment();
 					
-					dateFrom = _dateFrom;
-					dateTo = _dateTo;
-					
-					$('#dateFrom').val(moment(dateFrom).format('YYYY-MM-DD'));
-					$('#dateTo').val(moment(dateTo).format('YYYY-MM-DD'));
-
-					updateDateNav();
-
-					mapMarkers();
+					location.href='./?dateFrom='+_dateFrom.format('YYYY-MM-DD') + '&dateTo=' + _dateTo.format('YYYY-MM-DD');
 					return false;
 				}
 				
-				/**
-				* Adds two numbers
-				* @return {Number} sum
-				*/
 				function gotoAccuracy(){
 					var _accuracy = parseInt($('#accuracy').val());
 					
@@ -217,38 +145,11 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 						Cookies.set('accuracy', _accuracy);
 						console.log("Accuracy cookie = " + Cookies.get('accuracy'));
 						
-						//location.href='./?dateFrom='+moment(dateFrom).format('YYYY-MM-DD') + '&dateTo=' + moment(dateTo).format('YYYY-MM-DD') + '&accuracy=' + _accuracy + '&trackerID=' + trackerID;
-
-						accuracy = _accuracy;
-
-						mapMarkers();
-
+						location.href='./?dateFrom='+moment(dateFrom).format('YYYY-MM-DD') + '&dateTo=' + moment(dateTo).format('YYYY-MM-DD') + '&accuracy=' + _accuracy;
 					}else{
 						$('#configCollapse').collapse('hide');
 					}
 					return false;
-				}
-
-				/**
-				* Adds two numbers
-				* @return {Number} sum
-				*/
-				function changeTrackerID(){
-					var _trackerID = $('#trackerID_selector').val();
-					
-					if(_trackerID != trackerID){
-						
-						Cookies.set('trackerID', _trackerID);
-						console.log("trackerID cookie = " + Cookies.get('trackerID'));
-						
-						trackerID = _trackerID;
-						drawMap();
-
-					}else{
-						$('#configCollapse').collapse('hide');
-					}
-					return false;
-
 				}
 				
 				
@@ -260,17 +161,33 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 				var datePrevTo;
 				var dateNextFrom;
 				var dateNextTo;
-				var trackerID;
-				var trackerIDs = [];
 				
-				/**
-				* Adds two numbers
-				* @param {Number} a 
-				*/
-				function initUI(){
-					dateTo = moment();
-					dateFrom = moment();
-					updateDateNav();
+				$(function(){
+					
+					dateTo = moment('<?php echo $dateTo; ?>');
+					dateFrom = moment('<?php echo $dateFrom; ?>');
+					accuracy = <?php echo $accuracy; ?>;
+
+					diff = dateTo.diff(dateFrom, 'days');
+					//if(dateTo.isSame(dateFrom)){ diff = diff+1; }
+					
+					datePrevTo = moment(dateFrom).subtract(1, 'days');;
+					datePrevFrom = moment(datePrevTo).subtract(diff, 'days');
+					
+					dateNextFrom = moment(dateTo).add(1, 'days');
+					dateNextTo = moment(dateNextFrom).add(diff, 'days');
+					
+					//disable Next button
+					if(dateNextFrom.isAfter(moment())){
+						$('#nextButton').addClass('disabled');
+					}
+					
+					//disable today button
+					if(dateNextFrom.isSame(moment())){
+						$('#todayButton').addClass('disabled');
+					}else{
+						$('#livemap_on').addClass('disabled');
+					}
 					
 					$('.input-daterange').datepicker({
 						format: 'yyyy-mm-dd',
@@ -281,30 +198,21 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 					$('.input-daterange').datepicker().on('hide', function(e) {
 				        return gotoDate($('#dateFrom').val(), $('#dateTo').val());
 				    });
-					
-					accuracy = <?php echo $accuracy; ?>;
-					$('#accuracy').change(function(){
-						gotoAccuracy();
-					});
-					$('#accuracySubmit').click(function(){
-						gotoAccuracy();
-					});
-					
-					
-
-					trackerID = "<?php echo $trackerID; ?>";
-
-					$('#trackerID_selector').change(function(){
-						changeTrackerID();
-					});
-
-					$('#configCollapse').on('show.bs.collapse', function (e) {
-					    $('#configButton').removeClass( "btn-default" ).addClass( "btn-primary" ).addClass( "active" );
-					})
-					$('#configCollapse').on('hide.bs.collapse', function (e) {
-					    $('#configButton').addClass( "btn-default" ).removeClass( "btn-primary" ).removeClass( "active" );
-					})
-				}
+				});
+				
+				$('#accuracy').change(function(){
+					gotoAccuracy();
+				});
+				$('#accuracySubmit').click(function(){
+					gotoAccuracy();
+				});
+				
+				$('#configCollapse').on('show.bs.collapse', function (e) {
+				    $('#configButton').removeClass( "btn-default" ).addClass( "btn-primary" ).addClass( "active" );
+				})
+				$('#configCollapse').on('hide.bs.collapse', function (e) {
+				    $('#configButton').addClass( "btn-default" ).removeClass( "btn-primary" ).removeClass( "active" );
+				})
 				
 			</script>
 		</div>
@@ -314,10 +222,8 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 			<script>
 				
 				var i;
-				var map_drawn = false;
-				var show_markers;
+				var markers_set;
 				var mymap;
-				var tid_markers; // markers collected from json
 				var my_marker;
 				var my_markers = [];
 				var my_latlngs = [];
@@ -326,58 +232,16 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 				var default_center;
 				var live_view = false;
 				var live_view_timer;
-
-				var marker_start_icons = [];
-				var marker_finish_icons = [];
-				var marker_icons = [];
-
 				
 				$( document ).ready(function() {
-					initUI();
-					initMap();
-				});
-
-				/**
-				* Adds two numbers
-				*/
-				function initMap(){
-					show_markers = Cookies.get('show_markers');
-
-					marker_start_icons[0] = L.AwesomeMarkers.icon({icon: 'play', markerColor: 'blue' });
-					marker_start_icons[1] = L.AwesomeMarkers.icon({icon: 'play', markerColor: 'red' });
-					marker_start_icons[2] = L.AwesomeMarkers.icon({icon: 'play', markerColor: 'orange' });
-					marker_start_icons[3] = L.AwesomeMarkers.icon({icon: 'play', markerColor: 'green' });
-					marker_start_icons[4] = L.AwesomeMarkers.icon({icon: 'play', markerColor: 'purple' });
-					marker_start_icons[5] = L.AwesomeMarkers.icon({icon: 'play', markerColor: 'cadetblue' });
-					marker_start_icons[6] = L.AwesomeMarkers.icon({icon: 'play', markerColor: 'darkred' });
-					marker_start_icons[7] = L.AwesomeMarkers.icon({icon: 'play', markerColor: 'darkgreen' });
-					marker_start_icons[8] = L.AwesomeMarkers.icon({icon: 'play', markerColor: 'darkpuple' });
 					
-				    marker_finish_icons[0] = L.AwesomeMarkers.icon({icon: 'stop', markerColor: 'blue' });
-					marker_finish_icons[1] = L.AwesomeMarkers.icon({icon: 'stop', markerColor: 'red' });
-					marker_finish_icons[2] = L.AwesomeMarkers.icon({icon: 'stop', markerColor: 'orange' });
-					marker_finish_icons[3] = L.AwesomeMarkers.icon({icon: 'stop', markerColor: 'green' });
-					marker_finish_icons[4] = L.AwesomeMarkers.icon({icon: 'stop', markerColor: 'purple' });
-					marker_finish_icons[5] = L.AwesomeMarkers.icon({icon: 'stop', markerColor: 'cadetblue' });
-					marker_finish_icons[6] = L.AwesomeMarkers.icon({icon: 'stop', markerColor: 'darkred' });
-					marker_finish_icons[7] = L.AwesomeMarkers.icon({icon: 'stop', markerColor: 'darkgreen' });
-					marker_finish_icons[8] = L.AwesomeMarkers.icon({icon: 'stop', markerColor: 'darkpuple' });
-					
-				    marker_icons[0] = L.AwesomeMarkers.icon({icon: 'user', markerColor: 'blue' });
-					marker_icons[1] = L.AwesomeMarkers.icon({icon: 'user', markerColor: 'red' });
-					marker_icons[2] = L.AwesomeMarkers.icon({icon: 'user', markerColor: 'orange' });
-					marker_icons[3] = L.AwesomeMarkers.icon({icon: 'user', markerColor: 'green' });
-					marker_icons[4] = L.AwesomeMarkers.icon({icon: 'user', markerColor: 'purple' });
-					marker_icons[5] = L.AwesomeMarkers.icon({icon: 'user', markerColor: 'cadetblue' });
-					marker_icons[6] = L.AwesomeMarkers.icon({icon: 'user', markerColor: 'darkred' });
-					marker_icons[7] = L.AwesomeMarkers.icon({icon: 'user', markerColor: 'darkgreen' });
-					marker_icons[8] = L.AwesomeMarkers.icon({icon: 'user', markerColor: 'darkpuple' });
+					markers_set = Cookies.get('markers_on');
 					
 				    //set checkbox
-				    if(show_markers == '1'){
+				    if(markers_set == '1'){
 				    	//hideMarkers();
-						//$('#show_markers').prop('checked',false);
-						$('#show_markers').removeClass( "btn-default" ).addClass( "btn-primary" ).addClass( "active" );
+						//$('#markers_on').prop('checked',false);
+						$('#markers_on').removeClass( "btn-default" ).addClass( "btn-primary" ).addClass( "active" );
 				    }
 					
 					mymap = L.map('mapid').setView([48.866667, 2.333333], 11);
@@ -387,30 +251,19 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 					    subdomains: ['a','b','c']
 					}).addTo( mymap );
 					
-					mapMarkers();
+					getMarkers();
 					
 					
 					
 					
 					
-					//wait 2 second before reading current zoom and location and set as default
+					//wait 1 second before reading current zoom and location
 					setTimeout(function() {
 						default_zoom = mymap.getZoom();
 						default_center = mymap.getCenter();
-					}, 2000);
-				}
+					}, 5000);
+				});
 				
-				/**
-				* Adds two numbers
-				*/
-				function mapMarkers(){
-
-					getMarkers();
-				}
-
-				/**
-				* Adds two numbers
-				*/
 				function getMarkers(){
 					
 					//ajax call to get list of markers
@@ -420,26 +273,18 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 				        	'dateFrom': dateFrom.format('YYYY-MM-DD'),
 				        	'dateTo': dateTo.format('YYYY-MM-DD'),
 				        	'accuracy': accuracy,
-				        	'trackerID' : trackerID,
 				        	'action': 'getMarkers'
 				        },
 				        type: 'GET',
         				dataType: 'json',
-        				beforeSend: function(xhr)
-        				{
-        					$('#mapid').css('filter','blur(5px)');
-        				},
 				        success: function(data, status)
 				        {
 				            if(data.status){
-						        
-								jsonMarkers = JSON.parse(data.markers);
-
-								updateTrackerIDs(jsonMarkers);
+						        //removing element from JS array
+								markers = JSON.parse(data.markers);
 								
-								drawMap(jsonMarkers);
-
-								$('#mapid').css('filter','blur(0px)');
+								eraseMap();
+								drawMap(markers);
 								
 				        	}else{
 				        		console.log("Status : " + status);
@@ -453,151 +298,67 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 				    });
 					
 				}
-
-				function updateTrackerIDs(_tid_markers){
-
-					if(typeof _tid_markers != "undefined") { trackerIDs = Object.keys(_tid_markers); }
-
-					$("#trackerID_selector option[value!='<?php echo $_config['default_trackerID']; ?>']").each(function() {
-					    $(this).remove();
-					});
-
-					$.each(trackerIDs, function( index, value ) {
-						$('#trackerID_selector').append($('<option>', {
-						    value: value,
-						    text: value
-						}));
-					});
-
-					$("#trackerID_selector").val(trackerID);
-
-
-				}
 				
-				/**
-				* Draws a set of location tracks per tid in _tid_markers array
-				* @param {Array} _tid_markers 
-				*/
-				function drawMap(_tid_markers){
-
+				function drawMap(markers){
 					
-					if(typeof _tid_markers == "undefined") {
-						_tid_markers = tid_markers;
-					}else{
-						if(typeof tid_markers == "undefined") { tid_markers = _tid_markers; }
-
-					}
-
-
-					//vars for map bounding
-					max_lat = -1000;
-					min_lat = 1000;
-					max_lon = -1000;
-					min_lon = 1000;
-
-					if(map_drawn){ eraseMap(); }
-
-					nb_markers=0; // global markers counter
-					trackerIDs = Object.keys(_tid_markers);
-
-					if(trackerIDs.length > 0){
-
-						
-						for ( j=0; j < trackerIDs.length; ++j ){
-							
-
-							tid = trackerIDs[j];
-							markers = _tid_markers[tid];
-							my_latlngs[tid] = [];
-							my_markers[tid] = [];
-
-							if(trackerID == "<?php echo $_config['default_trackerID']; ?>" || trackerID == tid){
-
-								var trackerIDString = '<br/>TrackerID : ' + tid;
-								
-								if(markers.length > 0){
-									for ( i=0; i < markers.length; ++i ) {
-									
-									   	nb_markers = nb_markers+1;
-									   	dateString = markers[i].dt;
-										if(markers[i].epoch != 0){
-											var newDate = new Date();
-											newDate.setTime(markers[i].epoch * 1000);
-											dateString = newDate.toLocaleString();
-										}
-										
-										var accuracyString = '<br/>Accuracy : ' + markers[i].accuracy + ' m';
-										var headingString = "";
-										var velocityString = "";
-										var locationString = "";
-										if(markers[i].heading != null) headingString = '<br/>Heading : ' + markers[i].heading + ' °';
-										if(markers[i].velocity != null) velocityString = '<br/>Velocity : ' + markers[i].velocity + ' km/h';
-										if(markers[i].display_name != null){
-											locationString = "<br/>Location : <a href='javascript:showBoundingBox("+ i +");' title='Show location bounding box' >" + markers[i].display_name + '</a>';
-										}else{
-											locationString = "<br/>Location : <span id='loc_"+ i +"'><a href='javascript:geodecodeMarker("+ i +");' title='Get location (geodecode)'>Get location</a></span>";
-										}
-										
-										removeString = "<br/><br/><a href='javascript:removeMarker("+ i +");'>Delete marker</a>";
-										
-										//prepare popup HTML code for marker
-										popupString = dateString + trackerIDString + accuracyString + headingString + velocityString + locationString + removeString;
-									   	
-									   	//create leaflet market object with custom icon based on tid index in array
-								   		//first marker
-								   		if(i == 0){
-								   			my_marker = L.marker( [markers[i].latitude, markers[i].longitude], {icon: marker_start_icons[j]} ).bindPopup(popupString);
-								   		//last marker					   			
-								   		}else if(i == markers.length-1){
-								   			my_marker = L.marker( [markers[i].latitude, markers[i].longitude], {icon: marker_finish_icons[j]} ).bindPopup(popupString);	
-								   		//all other markers				   			
-								   		}else{
-								   			my_marker = L.marker( [markers[i].latitude, markers[i].longitude], {icon: marker_icons[j]} ).bindPopup(popupString);
-								   		}
-
-								   		if(max_lat < markers[i].latitude) { max_lat = markers[i].latitude; }
-								   		if(min_lat > markers[i].latitude) { min_lat = markers[i].latitude; }
-								   		if(max_lon < markers[i].longitude) { max_lon = markers[i].longitude; }
-								   		if(min_lon > markers[i].longitude) { min_lon = markers[i].longitude; }
-								   		
-								   		//add marker to map only if cookie 'show_markers' says to or if 1st or last marker
-								   		if(show_markers != '0' || i == 0 || i == markers.length-1){
-								   			my_marker.addTo( mymap );					   			
-								   		}
-								   		/*
-								   		//default show popup for last marker of track
-								   		if(i == markers.length-1){
-								   			my_marker.addTo( mymap ).openPopup();;					   			
-								   		}
-								   		*/
-
-								   		//collect all markers location to prepare drawing track, per trackerID
-								   		my_latlngs[tid][i] = [markers[i].latitude, markers[i].longitude, i];
-								   		
-								   		
-								   		//todo : onmouseover marker, display accuracy radius
-								   		//if(markers[i].acc > 0){
-									   /*
-									   if(i+1 == markers.length && markers[i].acc > 0){
-									   		var circle = L.circle(my_latlngs[i], {
-											    opacity: 0.2,
-											    radius: markers[i].acc
-											}).addTo(mymap);
-									   }
-									   */
-
-									   //array of all markers for display / hide markers + initial auto zoom scale
-									   my_markers[tid][i] = my_marker;
-									   
-									}
-								}else{
-									alert('No location data for trackerID \'' + trackerID + '\' found !');
-								}
+					if(markers.length > 0){
+						for ( i=0; i < markers.length; ++i ) 
+						{
+						   	
+						   	dateString = markers[i].dt;
+							if(markers[i].epoch != 0){
+								var newDate = new Date();
+								newDate.setTime(markers[i].epoch * 1000);
+								dateString = newDate.toLocaleString();
 							}
+							
+							var accuracyString = '<br/>Accuracy : ' + markers[i].accuracy + ' m';
+							var headingString = "";
+							var velocityString = "";
+							var locationString = "";
+							if(markers[i].heading != null) headingString = '<br/>Heading : ' + markers[i].heading + ' °';
+							if(markers[i].velocity != null) velocityString = '<br/>Velocity : ' + markers[i].velocity + ' km/h';
+							if(markers[i].display_name != null){
+								locationString = "<br/>Location : <a href='javascript:showBoundingBox("+ i +");' title='Show location bounding box' >" + markers[i].display_name + '</a>';
+							}else{
+								locationString = "<br/>Location : <span id='loc_"+ i +"'><a href='javascript:geodecodeMarker("+ i +");' title='Get location (geodecode)'>Get location</a></span>";
+							}
+							
+							removeString = "<br/><br/><a href='javascript:removeMarker("+ i +");'>Delete marker</a>";
+							
+							popupString = dateString + accuracyString + headingString + velocityString + locationString + removeString;
+						   
+					   		my_marker = L.marker( [markers[i].latitude, markers[i].longitude] ).bindPopup(popupString);
+					   		
+					   		//display marker only if cookie says to
+					   		if(markers_set != '0' || i == 0 || i == markers.length-1){
+					   			my_marker.addTo( mymap );					   			
+					   		}
+					   		if(i == markers.length-1){
+					   			my_marker.addTo( mymap ).openPopup();;					   			
+					   		}
+					   		my_latlngs[i] = [markers[i].latitude, markers[i].longitude, i];
+					   		
+					   		
+					   		//todo : onmouseover marker, display accuracy radius
+					   		//if(markers[i].acc > 0){
+						   /*
+						   if(i+1 == markers.length && markers[i].acc > 0){
+						   		var circle = L.circle(my_latlngs[i], {
+								    opacity: 0.2,
+								    radius: markers[i].acc
+								}).addTo(mymap);
+						   }
+						   */
+						   my_markers[i] = my_marker;
+						   
 						}
 						
-						//var polyline = L.polyline(my_latlngs[tid]).addTo(mymap);
-						polyline = L.hotline(my_latlngs[tid], {
+						var group = new L.featureGroup(my_markers);
+			 			mymap.fitBounds(group.getBounds());
+					
+						//var polyline = L.polyline(my_latlngs).addTo(mymap);
+						polyline = L.hotline(my_latlngs, {
 								min: 0,
 								max: markers.length,
 								palette: {
@@ -612,50 +373,20 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 					
 						
 
-					}else{
-						alert('No location data found for any trackerID !');
-					}
-
-					//auto zoom scale based on all markers location
-					mymap.fitBounds([
-					    [min_lat, min_lon],
-					    [max_lat, max_lon]
-					]);
-					
-					//set map drawn flag
-					map_drawn = true;
+					}	
 					
 					return true;
 				}
 				
-				/**
-				* Adds two numbers
-				*/
 				function eraseMap(){
-					
 					if (polyline != null){
 					    polyline.removeFrom(mymap);
 					}
 					
-					$.each(trackerIDs, function(_index, _tid){
-
-						//if(trackerID == _tid || trackerID == "<?php echo $_config['default_trackerID']; ?>"){
-
-							$.each(my_markers[_tid], function(_index2, _marker){
-
-								_marker.remove();
-							
-							});
-						//}
-
-					});
-					
+					hideMarkers();
 					return true;
 				}
 				
-				/**
-				* Adds two numbers
-				*/
 				function setLiveMap(){
 					live_view = !live_view;
 					
@@ -669,71 +400,38 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 					}
 				}
 				
-				/**
-				* Adds two numbers
-				*/
+				//map manipulation
 				function showMarkers(){
-					
-					$.each(trackerIDs, function(_index, _tid){
-
-						if(trackerID == _tid || trackerID == "<?php echo $_config['default_trackerID']; ?>"){
-
-							$.each(my_markers[_tid], function(_index2, _marker){
-
-								//add marker to map except first & last (never removed)
-								if(_index2 != 0 || _index2 !=my_markers[_tid].length){
-									_marker.addTo( mymap );
-								}
-							});
-						}
-
-					});
+					for ( var i=1; i < markers.length-1; ++i ) 
+					{
+					   my_markers[i].addTo( mymap );
+					}
 					return true;
 				}
-				/**
-				* Adds two numbers
-				*/
 				function hideMarkers(){
-
-					$.each(trackerIDs, function(_index, _tid){
-
-						if(trackerID == _tid || trackerID == "<?php echo $_config['default_trackerID']; ?>"){
-
-							$.each(my_markers[_tid], function(_index2, _marker){
-console.log(_index2);
-								//remove marker except first & last
-								if(_index2 > 0 && _index2 < my_markers[_tid].length-1){
-									_marker.remove();
-								}
-							});
+					if(markers.length == my_markers.length){
+						for ( var i=1; i < markers.length-1; ++i ) 
+						{
+						   my_markers[i].remove();
 						}
-
-					});
-
+					}
 					return true;
 				}
-				/**
-				* Adds two numbers
-				*/
 				function showHideMarkers(){
-					//$('#show_markers').change(function() {
-					if($('#show_markers').hasClass( "btn-default" )){
+					//$('#markers_on').change(function() {
+					if($('#markers_on').hasClass( "btn-default" )){
 						showMarkers();
-						Cookies.set('show_markers', 1, { expires: 365 });
-						$('#show_markers').removeClass( "btn-default" ).addClass( "btn-primary" ).addClass( "active" );
+						Cookies.set('markers_on', 1, { expires: 365 });
+						$('#markers_on').removeClass( "btn-default" ).addClass( "btn-primary" ).addClass( "active" );
 						return true;
 					}else{
 						hideMarkers();
-						Cookies.set('show_markers', 0, { expires: 365 });
-						$('#show_markers').removeClass("btn-primary").removeClass("active").addClass("btn-default");
+						Cookies.set('markers_on', 0, { expires: 365 });
+						$('#markers_on').removeClass("btn-primary").removeClass("active").addClass("btn-default");
 						return true;
 					}
 				}
 				
-				/**
-				* Adds two numbers
-				* @param {Number} a 
-				*/
 				function geodecodeMarker(i){
 					
 					console.log("Geodecoding marker #" + i);
@@ -770,14 +468,10 @@ console.log(_index2);
 					
 				}
 				
-				/**
-				* Adds two numbers
-				* @param {Number} a 
-				*/
-				function deleteMarker(i){
+				function removeMarker(i){
 					
 					
-					if(confirm('Do you really want to permanently delete marker ?')){
+					if(confirm('Do you really want to remove marker ?')){
 						console.log("Removing marker #" + i);
 						
 						//ajax call to remove marker from backend
@@ -785,7 +479,7 @@ console.log(_index2);
 					        url: 'rpc.php',
 					        data: {
 					        	'epoch': markers[i].epoch,
-					        	'action': 'deleteMarker'
+					        	'action': 'removeMarker'
 					        },
 					        type: 'get',
 	        				dataType: 'json',
@@ -811,19 +505,13 @@ console.log(_index2);
 					}
 				}
 				
-				/**
-				* Adds two numbers
-				* @param {Number} a 
-				*/
 				function showBoundingBox(i){
 					
 					
 					
 				}
 				
-				/**
-				* Adds two numbers
-				*/
+				//zoom manipulation
 				function resetZoom(){
 					mymap.setView(default_center, default_zoom);
 					return false;
