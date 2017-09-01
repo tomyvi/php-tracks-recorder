@@ -389,15 +389,15 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 					
 					mapMarkers();
 					
-					
-					
-					
-					
-					//wait 2 second before reading current zoom and location and set as default
+				}
+
+				function setDefaultZoom(){
+
 					setTimeout(function() {
 						default_zoom = mymap.getZoom();
 						default_center = mymap.getCenter();
 					}, 2000);
+					
 				}
 				
 				/**
@@ -623,6 +623,9 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 					}else{
 						alert('No location data found for any trackerID !');
 					}
+
+					//save default zoom scale
+					setDefaultZoom();
 
 					//auto zoom scale based on all markers location
 					mymap.fitBounds([
