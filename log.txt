@@ -1,5 +1,0 @@
-http://193.63.75.109/reverse?format=json&zoom=18&accept-language=fr&addressdetails=0&email=sjobs@apple.com&lat=48.876545233417&lon=2.1661708333632
-{"place_id":"120301329","licence":"Data © OpenStreetMap contributors, ODbL 1.0. http:\/\/www.openstreetmap.org\/copyright","osm_type":"way","osm_id":"244305302","lat":"48.8766759","lon":"2.1662196","display_name":"Rue Nadar, Buzenval, Rueil-Malmaison, Nanterre, Hauts-de-Seine, Île-de-France, 92500, France","boundingbox":["48.8757383","48.8772317","2.164752","2.1675893"]}
-place_id:120301329
-osm_id:244305302
-display_name:Rue Nadar, Buzenval, Rueil-Malmaison, Nanterre, Hauts-de-Seine, Île-de-France, 92500, France
