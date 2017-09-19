@@ -1,4 +1,18 @@
 <?php
+
+$fp = fopen('./log/record_log.txt', 'a+');
+function _log($msg){
+	
+	global $fp;
+	
+	if(!$fp) { $fp = fopen('./log/record_log.txt', 'a+'); }
+	
+	return fprintf($fp, date('Y-m-d H:i:s') . " - ".$_SERVER['REMOTE_ADDR']." - %s\n", $msg);
+	
+}
+
+
+
 //http://owntracks.org/booklet/tech/http/
 # Obtain the JSON payload from an OwnTracks app POSTed via HTTP
 # and insert into database table.
@@ -7,6 +21,7 @@ header("Content-type: application/json");
 require_once('./config.inc.php');
 
 $payload = file_get_contents("php://input");
+_log("Payload = ".$payload);
 $data =  @json_decode($payload, true);
 
 if ($data['_type'] == 'location') {
@@ -33,53 +48,41 @@ if ($data['_type'] == 'location') {
 	if (array_key_exists('p', $data)) $pressure = floatval($data['p']);
 	if (array_key_exists('conn', $data)) $connection = strval($data['conn']);
 	
-	/*
-	if($_config['enable_geo_reverse']){
-		
-		$geo_decode_url = $_config['geo_reverse_lookup_url'] . 'lat=' .$latitude. '&lon='.$longitude;
-
-		$geo_decode_json = file_get_contents($geo_decode_url);		
-
-		$geo_decode = @json_decode($geo_decode_json, true);
-
 	
-		$place_id = intval($geo_decode['place_id']);
-		$osm_id = intval($geo_decode['osm_id']);
-		$display_name = strval($geo_decode['display_name']);
-		
-		if($display_name == '') { $display_name = @json_encode($geo_decode); }
-
-	}
-	*/
+	$sql = "SELECT epoch FROM ".$_config['sql_prefix']."locations WHERE tracker_id = '$tracker_id' AND epoch = $epoch";
 	
-	$sql = "SELECT epoch FROM ".$_config['sql_prefix']."locations WHERE tracker_id = ? AND epoch = ?";
-
+	_log("Duplicate SQL = ".$sql);
+	
 	if ($stmt = $mysqli->prepare($sql)){
     	
-    	$stmt->bind_param('si', $tracker_id, $epoch);
     	$stmt->execute();
 		$stmt->store_result();
-
+		
+		_log("Duplicate SQL : Rows found =  ".$stmt->num_rows);
 
 	    //record only if same data found at same epoch / tracker_id
 	    if($stmt->num_rows == 0) {
 
 			$sql = "INSERT INTO ".$_config['sql_prefix']."locations (accuracy, altitude, battery_level, heading, description, event, latitude, longitude, radius, trig, tracker_id, epoch, vertical_accuracy, velocity, pressure, connection, place_id, osm_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		    
-		    if ($stmt = $mysqli->prepare($sql)){
+		    $stmt = $mysqli->prepare($sql);
+		    $stmt->bind_param('iiiissddissiiidsii', $accuracy, $altitude, $battery_level, $heading, $description, $event, $latitude, $longitude, $radius, $trig, $tracker_id, $epoch, $vertical_accuracy, $velocity, $pressure, $connection, $place_id, $osm_id);
+			    
+		    if ($stmt->execute()){
 		    	
 		    	# bind parameters (s = string, i = integer, d = double,  b = blob)
-			    $stmt->bind_param('iiiissddissiiidsii', $accuracy, $altitude, $battery_level, $heading, $description, $event, $latitude, $longitude, $radius, $trig, $tracker_id, $epoch, $vertical_accuracy, $velocity, $pressure, $connection, $place_id, $osm_id);
-			    $stmt->execute();
 			    http_response_code(200);
 				$response['msg'] = "OK record saved";
+				_log("Insert OK");
 			
 		    }else{
 				http_response_code(500);
-				die("Can't write to database");
+				die("Can't write to database : ".$stmt->error);
 				$response['msg'] = "Can't write to database";
+				_log("Insert KO - Can't write to database : ".$stmt->error);
 			}
 
+	    }else{
+	    	_log("Duplicate location found for epoc $epoch / tid '$tracker_id' - no insert");
 	    }
 	    $stmt->close();
 	
@@ -87,6 +90,7 @@ if ($data['_type'] == 'location') {
 		http_response_code(500);
 		die("Can't read from database");
 		$response['msg'] = "Can't read from database";
+		_log("Can't read from database");
 	}
 
 
@@ -97,10 +101,12 @@ if ($data['_type'] == 'location') {
 }else{
 	http_response_code(204);
 	$response['msg'] = "OK type is not location";
+	_log("OK type is not location : " . $data['_type']);
 }
 
 $response = array();
-# optionally add objects to return to the app (e.g.
-# friends or cards)
+
 print json_encode($response);
+
+fclose($fp);
 ?>
