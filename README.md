@@ -27,19 +27,19 @@ That's it !
 1. Download the source code and copy the content of the directory to your prefered location
 2. Edit the ```config.inc.sample.php``` file to setup access to your database and rename to ```config.inc.php``` :
 ```php
-	$_config['sql_host']          // sql server hostname
-	$_config['sql_user']          // sql server username
-	$_config['sql_pass']          // sql server username password
-	$_config['sql_db']            // database name
-	
-	$_config['sql_prefix']        // table prefix
+	$_config['sql_type']          // database type 'mysql' (MySQL/MariaDB) or 'sqlite'
+	$_config['sql_host']          // sql server hostname (only needed for 'mysql')
+	$_config['sql_user']          // sql server username (only needed for 'mysql')
+	$_config['sql_pass']          // sql server username password (only needed for 'mysql')
+	$_config['sql_db']            // database name or SQLite filename
+	$_config['sql_prefix']        // table prefix (only needed for 'mysql')
 	
 	$_config['default_accuracy']  // default maxymum accuracy for location record to be displayed on the map
 	
 	$_config['enable_geo_reverse'] // set to TRUE to enable geo decoding of location records
 	$_config['geo_reverse_lookup_url'] // geodecoding api url, will be appended with lat= & lon= attributes 
 ```
-3. Create datatable using schema.sql (in the 'sql' directory)
+3. Create datatable using schema_mysql.sql or schema_sqlite.sql (in the 'sql' directory)
 
 #### Owntracks app
 Follow [Owntracks Booklet](http://owntracks.org/booklet/features/settings/) to setup your Owntracks app :

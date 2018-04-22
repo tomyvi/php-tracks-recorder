@@ -12,6 +12,10 @@
 	$_config['sql_db'] = '';
 	$_config['sql_prefix'] = '';
 
+	// SQLite
+	//$_config['sql_type'] = 'sqlite';
+	//$_config['sql_db'] = 'owntracks.db3';
+	
 	$_config['default_accuracy'] = 1000; //meters
 	$_config['default_trackerID'] = 'all';
 	
