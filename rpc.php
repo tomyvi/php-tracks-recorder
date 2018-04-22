@@ -22,19 +22,19 @@
 
     if (array_key_exists('action', $_REQUEST)) {
 	    
-	    if($_REQUEST['action'] === 'getMarkers'){
+	    if ($_REQUEST['action'] === 'getMarkers') {
 	    	
-	    	if(!array_key_exists('dateFrom', $_GET)){
+	    	if (!array_key_exists('dateFrom', $_GET)) {
 		        $_GET['dateFrom'] = date("Y-m-d");
 		    }
 		
-		    if(!array_key_exists('dateTo', $_GET)){
+		    if (!array_key_exists('dateTo', $_GET)) {
 		        $_GET['dateTo'] = date("Y-m-d");
 		    }
 		
-		    if(array_key_exists('accuracy', $_GET) && $_GET['accuracy'] > 0){
+		    if (array_key_exists('accuracy', $_GET) && $_GET['accuracy'] > 0) {
 		        $accuracy = intVal($_GET['accuracy']);
-		    }else{
+		    } else {
 		        $accuracy = $_config['default_accuracy'];
 		    }
 		
@@ -58,9 +58,9 @@
 			}
 	    	
 	    	
-	    }else if($_REQUEST['action'] === 'deleteMarker'){
+	    } elseif ($_REQUEST['action'] === 'deleteMarker') {
 	    	
-	    	if(!array_key_exists('epoch', $_REQUEST)){
+	    	if (!array_key_exists('epoch', $_REQUEST)) {
 	    		$response['error'] = "No epoch provided for marker removal";
 	    		$response['status'] = false;
 	    		http_response_code(204);
@@ -103,10 +103,10 @@
 					$osm_id = intval($geo_decode['osm_id']);
 					$location = strval($geo_decode['display_name']);
 					
-					if($location == '') { $location = @json_encode($geo_decode); }
+					if ($location == '') { $location = @json_encode($geo_decode); }
 					
 					//UPDATE MARKER WITH GEODECODED LOCATION
-					$result = $sql->updateLocationData($epoch, $latitude, $longitude, $location_name, $place_id, $osm_id);
+					$result = $sql->updateLocationData((int)$_REQUEST['epoch'], (float)$latitude, (float)$longitude, $location, $place_id, $osm_id);
 					
 					if ($result === false) {
 						$response['error'] = 'Unable to update marker in database.';
@@ -121,13 +121,13 @@
 	    		
 	    	}
 	    	
-	    }else{
+	    } else {
 	    	$response['error'] = "No action to perform";
 	    	$response['status'] = false;
 	    	http_response_code(404);
 	    }
 	    
-	}else{
+	} else {
     	$response['error'] = "Invalid request type or no action";
     	$response['status'] = false;
     	http_response_code(404);
