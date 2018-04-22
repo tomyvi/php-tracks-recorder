@@ -26,8 +26,17 @@ $data =  @json_decode($payload, true);
 
 if ($data['_type'] == 'location') {
 
-    # CREATE TABLE locations (dt TIMESTAMP, tid CHAR(2), lat DECIMAL(9,6), lon DECIMAL(9,6));
-    $mysqli = new mysqli($_config['sql_host'], $_config['sql_user'], $_config['sql_pass'], $_config['sql_db']);
+	if ($_config['sql_type'] == 'mysql') {
+		require_once('lib/db/MySql.php');
+		$sql = new MySql($_config['sql_db'], $_config['sql_host'], $_config['sql_user'], $_config['sql_pass'], $_config['sql_prefix']);
+	} elseif ($_config['sql_type'] == 'sqlite') {
+		require_once('lib/db/SQLite.php');
+		$sql = new SQLite($_config['sql_db']);
+	} else {
+		die('Invalid database type: ' . $_config['sql_type']);
+	}
+
+	# CREATE TABLE locations (dt TIMESTAMP, tid CHAR(2), lat DECIMAL(9,6), lon DECIMAL(9,6));
 	
 	//http://owntracks.org/booklet/tech/json/
 	//iiiissddissiiidsiis
@@ -49,56 +58,47 @@ if ($data['_type'] == 'location') {
 	if (array_key_exists('conn', $data)) $connection = strval($data['conn']);
 	
 	
-	$sql = "SELECT epoch FROM ".$_config['sql_prefix']."locations WHERE tracker_id = '$tracker_id' AND epoch = $epoch";
-	
-	_log("Duplicate SQL = ".$sql);
-	
-	if ($stmt = $mysqli->prepare($sql)){
-    	
-    	$stmt->execute();
-		$stmt->store_result();
-		
-		_log("Duplicate SQL : Rows found =  ".$stmt->num_rows);
+	//record only if same data found at same epoch / tracker_id
+	if (!$sql->isEpochExisting($tracker_id, $epoch)) {
 
-	    //record only if same data found at same epoch / tracker_id
-	    if($stmt->num_rows == 0) {
-
-			$sql = "INSERT INTO ".$_config['sql_prefix']."locations (accuracy, altitude, battery_level, heading, description, event, latitude, longitude, radius, trig, tracker_id, epoch, vertical_accuracy, velocity, pressure, connection, place_id, osm_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		    $stmt = $mysqli->prepare($sql);
-		    $stmt->bind_param('iiiissddissiiidsii', $accuracy, $altitude, $battery_level, $heading, $description, $event, $latitude, $longitude, $radius, $trig, $tracker_id, $epoch, $vertical_accuracy, $velocity, $pressure, $connection, $place_id, $osm_id);
-			    
-		    if ($stmt->execute()){
-		    	
-		    	# bind parameters (s = string, i = integer, d = double,  b = blob)
-			    http_response_code(200);
-				$response['msg'] = "OK record saved";
-				_log("Insert OK");
+		$result = $sql->addLocation(
+			$accuracy,
+			$altitude,
+			$battery_level,
+			$heading,
+			$description,
+			$event,
+			$latitude,
+			$longitude,
+			$radius,
+			$trig,
+			$tracker_id,
+			$epoch,
+			$vertical_accuracy,
+			$velocity,
+			$pressure,
+			$connection,
+			$place_id,
+			$osm_id
+		);
 			
-		    }else{
-				http_response_code(500);
-				die("Can't write to database : ".$stmt->error);
-				$response['msg'] = "Can't write to database";
-				_log("Insert KO - Can't write to database : ".$stmt->error);
-			}
+		if ($result) {
+			http_response_code(200);
+			$response['msg'] = "OK record saved";
+			_log("Insert OK");
+		} else {
+			http_response_code(500);
+			die("Can't write to database : ".$stmt->error);
+			$response['msg'] = "Can't write to database";
+			_log("Insert KO - Can't write to database : ".$stmt->error);
+		}
 
-	    }else{
-	    	_log("Duplicate location found for epoc $epoch / tid '$tracker_id' - no insert");
-	    }
-	    $stmt->close();
-	
-    }else{
-		http_response_code(500);
-		die("Can't read from database");
-		$response['msg'] = "Can't read from database";
-		_log("Can't read from database");
+	} else {
+		_log("Duplicate location found for epoc $epoch / tid '$tracker_id' - no insert");
 	}
-
-
+	$stmt->close();
     
-
-    
-
-}else{
+} else {
 	http_response_code(204);
 	$response['msg'] = "OK type is not location";
 	_log("OK type is not location : " . $data['_type']);
@@ -109,4 +109,3 @@ $response = array();
 print json_encode($response);
 
 fclose($fp);
-?>

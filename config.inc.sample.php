@@ -4,13 +4,14 @@
 
 	setlocale(LC_TIME, "fr_FR");
 
+	// MySQL / MariaDB
+	$_config['sql_type'] = 'mysql';
 	$_config['sql_host'] = '';
 	$_config['sql_user'] = '';
 	$_config['sql_pass'] = '';
 	$_config['sql_db'] = '';
-	
 	$_config['sql_prefix'] = '';
-	
+
 	$_config['default_accuracy'] = 1000; //meters
 	$_config['default_trackerID'] = 'all';
 	
