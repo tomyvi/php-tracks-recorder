@@ -23,24 +23,24 @@ class AbstractDb
     }
 
     public function addLocation(
-        int $accuracy,
-        int $altitude,
-        int $battery_level,
-        int $heading,
-        string $description,
-        string $event,
+        int $accuracy = null,
+        int $altitude = null,
+        int $battery_level = null,
+        int $heading = null,
+        string $description = null,
+        string $event = null,
         float $latitude,
         float $longitude,
-        int $radius,
-        string $trig,
-        string $tracker_id,
+        int $radius = null,
+        string $trig = null,
+        string $tracker_id = null,
         int $epoch,
-        int $vertical_accuracy,
-        int $velocity,
-        float $pressure,
-        string $connection,
-        int $place_id,
-        int $osm_id
+        int $vertical_accuracy = null,
+        int $velocity = null,
+        float $pressure = null,
+        string $connection = null,
+        int $place_id = null,
+        int $osm_id = null
     ): bool {
         $sql = 'INSERT INTO ' . $this->prefix . 'locations (accuracy, altitude, battery_level, heading, description, event, latitude, longitude, radius, trig, tracker_id, epoch, vertical_accuracy, velocity, pressure, connection, place_id, osm_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         $params = array($accuracy, $altitude, $battery_level, $heading, $description, $event, $latitude, $longitude, $radius, $trig, $tracker_id, $epoch, $vertical_accuracy, $velocity, $pressure, $connection, $place_id, $osm_id);

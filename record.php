@@ -96,7 +96,6 @@ if ($data['_type'] == 'location') {
 	} else {
 		_log("Duplicate location found for epoc $epoch / tid '$tracker_id' - no insert");
 	}
-	$stmt->close();
     
 } else {
 	http_response_code(204);
