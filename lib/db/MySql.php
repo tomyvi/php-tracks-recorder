@@ -4,10 +4,6 @@ require_once(__DIR__ . '/AbstractDb.php');
 
 class MySql extends AbstractDb
 {
-    /** @var \mysqli $db */
-    protected $db;
-    protected $prefix;
-
     public function __construct($db, $hostname = null, $username = null, $password = null, $prefix = '')
     {
         $this->db = new \mysqli($hostname, $username, $password, $db);
@@ -82,7 +78,7 @@ class MySql extends AbstractDb
     public function getMarkerLatLon($epoch)
     {
         $sql = 'SELECT latitude, longitude FROM ' . $this->prefix . 'locations WHERE epoch = ?';
-        $stmt = $mysqli->prepare($sql);
+        $stmt = $this->db->prepare($sql);
 
         if (!$stmt) {
             return false;
@@ -124,7 +120,7 @@ class MySql extends AbstractDb
     public function updateLocationData($epoch, $latitude, $longitude, $location_name, $place_id, $osm_id)
     {
         $sql = 'UPDATE ' . $this->prefix . 'locations SET display_name = ?, place_id = ?, osm_id = ? WHERE epoch = ? AND latitude = ? AND longitude = ?';
-        $stmt = $mysqli->prepare($sql);
+        $stmt = $this->db->prepare($sql);
 
         if (!$stmt) {
             return false;

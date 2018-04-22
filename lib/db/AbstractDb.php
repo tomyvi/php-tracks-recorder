@@ -2,6 +2,8 @@
 
 class AbstractDb
 {
+    protected $db;
+    protected $prefix;
 
     public function isEpochExisting($trackerId, $epoch)
     {
