@@ -89,7 +89,6 @@ class MySql extends AbstractDb
             return false;
         }
 
-        $stmt->execute();
         $result = $stmt->get_result();
         $stmt->store_result();
         
