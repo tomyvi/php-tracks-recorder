@@ -29,35 +29,35 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 		<link rel="icon" href="./img/favicon.ico" />
 		
 		<!-- JQUERY !-->
-		<script src="./js/jquery-3.1.1.min.js"></script>
+		<script type="text/javascript" src="bower_components/jQuery/dist/jquery.min.js"></script>
 		
 		<!-- MOMENTS.JS !-->
-		<script src="./js/moment-with-locales.js"></script>
+		<script type="text/javascript" src="bower_components/moment/min/moment-with-locales.min.js"></script>
 		
 		<!-- BOOTSTRAP !-->
-		<script src="./js/bootstrap.min.js" ></script>
+		<script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js" ></script>
 		
 		<!-- BOOTSTRAP DATETIMEPICKER !-->
-		<script src="./js/bootstrap-datepicker.js"></script>
-		<script src="./js/bootstrap-datepicker.fr.min.js"></script>
+		<script type="text/javascript" src="bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+		<script type="text/javascript" src="bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.fr.min.js"></script>
 				
 		<!-- LEAFLET.JS !-->
-		<script src="./js/leaflet.js"></script>
-		<script src="./js/leaflet.hotline.js"></script>
-		<script src="./js/leaflet.awesome-markers.min.js"></script>
+		<script type="text/javascript" src="bower_components/leaflet/dist/leaflet.js"></script>
+		<script type="text/javascript" src="bower_components/leaflet-hotline/dist/leaflet.hotline.min.js"></script>
+		<script type="text/javascript" src="bower_components/leaflet-awesome-markers/dist/leaflet.awesome-markers.min.js"></script>
 		
-		<script src="./js/js.cookie.js"></script>
+		<script type="text/javascript" src="bower_components/js-cookie/src/js.cookie.js"></script>
 		
 		<!-- BOOTSTRAP !-->
-		<link rel="stylesheet" href="./css/bootstrap.min.css" />
-		<link rel="stylesheet" href="./css/bootstrap-theme.min.css" />
+		<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css" />
 		
 		<!-- BOOTSTRAP DATETIMEPICKER !-->
-		<link rel="stylesheet" href="./css/bootstrap-datepicker.css" />
+		<link rel="stylesheet" href="bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css" />
 				
 		<!-- LEAFLET.JS !-->
-		<link rel="stylesheet" href="./css/leaflet.css" />
-		<link rel="stylesheet" href="./css/leaflet.awesome-markers.css" />
+		<link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
+		<link rel="stylesheet" href="bower_components/leaflet-awesome-markers/dist/leaflet.awesome-markers.css" />
 		
 		<style>
 			#mapid { height: 85%; }
