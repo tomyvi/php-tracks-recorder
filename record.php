@@ -24,6 +24,8 @@ $payload = file_get_contents("php://input");
 _log("Payload = ".$payload);
 $data =  @json_decode($payload, true);
 
+$response_msg = null;
+
 if ($data['_type'] == 'location') {
 
 	if ($_config['sql_type'] == 'mysql') {
@@ -84,26 +86,33 @@ if ($data['_type'] == 'location') {
 			
 		if ($result) {
 			http_response_code(200);
-			$response['msg'] = "OK record saved";
 			_log("Insert OK");
 		} else {
 			http_response_code(500);
-			die("Can't write to database : ".$stmt->error);
-			$response['msg'] = "Can't write to database";
-			_log("Insert KO - Can't write to database : ".$stmt->error);
+			$response_msg = 'Can\'t write to database';
+			_log("Insert KO - Can't write to database.");
 		}
 
 	} else {
 		_log("Duplicate location found for epoc $epoch / tid '$tracker_id' - no insert");
+		$response_msg = 'Duplicate location found for epoch. Ignoring.';
 	}
     
 } else {
 	http_response_code(204);
-	$response['msg'] = "OK type is not location";
 	_log("OK type is not location : " . $data['_type']);
 }
 
 $response = array();
+
+if (!is_null($response_msg)) {
+    // Add status message to return object (to be shown in app)
+    $response[] = array(
+        '_type' => 'cmd',
+        'action' => 'action',
+        'content' => $response_msg,
+    );
+}
 
 print json_encode($response);
 
