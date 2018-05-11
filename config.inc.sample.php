@@ -4,6 +4,8 @@
 
 	setlocale(LC_TIME, "fr_FR");
 
+	$_config['log_enable'] = True;
+
 	$_config['sql_host'] = '';
 	$_config['sql_user'] = '';
 	$_config['sql_pass'] = '';
