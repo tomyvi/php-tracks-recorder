@@ -1,14 +1,17 @@
 <?php
 
-$fp = fopen('./log/record_log.txt', 'a+');
+$fp = NULL; //fopen('./log/record_log.txt', 'a+'); do not open file if not needed
 function _log($msg){
-	
 	global $fp;
+	global $_config;
 	
-	if(!$fp) { $fp = fopen('./log/record_log.txt', 'a+'); }
+	if($_config['log_enable'] === True){
+		if(!$fp) { $fp = fopen('./log/record_log.txt', 'a+'); }
 	
-	return fprintf($fp, date('Y-m-d H:i:s') . " - ".$_SERVER['REMOTE_ADDR']." - %s\n", $msg);
-	
+		return fprintf($fp, date('Y-m-d H:i:s') . " - ".$_SERVER['REMOTE_ADDR']." - %s\n", $msg);
+	} else {
+		return True;
+	}
 }
 
 
