@@ -6,6 +6,7 @@
 
 	// MySQL / MariaDB
 	$_config['sql_type'] = 'mysql';
+	
 	$_config['sql_host'] = '';
 	$_config['sql_user'] = '';
 	$_config['sql_pass'] = '';
@@ -16,7 +17,9 @@
 	//$_config['sql_type'] = 'sqlite';
 	//$_config['sql_db'] = 'owntracks.db3';
 	
-	$_config['default_accuracy'] = 1000; //meters
+	$_config['log_enable'] = True;
+  
+  $_config['default_accuracy'] = 1000; //meters
 	$_config['default_trackerID'] = 'all';
 	
 	$_config['geo_reverse_lookup_url'] = "http://193.63.75.109/reverse?format=json&zoom=18&accept-language=fr&addressdetails=0&email=sjobs@apple.com&";

@@ -74,7 +74,7 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 		<div class="container">
 			<div class="row page-header">
 				<div class="col-xs-1 text-left">
-					<a href="javascript:gotoDate(datePrevFrom, datePrevTo);" class="btn btn-primary" role="button">
+					<a onclick="gotoDate(datePrevFrom, datePrevTo);" class="btn btn-primary" role="button">
 						<span class="hidden-xs">Previous</span>
 						<span class="visible-xs"><span class="glyphicon glyphicon-arrow-left"></span></span>
 					</a>
@@ -93,15 +93,15 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 							<span class="visible-xs"><span class="glyphicon glyphicon-cog"></span></span>
 						</a>
 						
-						<a href="javascript:resetZoom();" class="btn btn-default">
+						<a onclick="resetZoom();" class="btn btn-default">
 							<span class="hidden-xs">Reset view</span>
 							<span class="visible-xs"><span class="glyphicon glyphicon-screenshot"></span></span>
 						</a>
-						<a href="javascript:gotoDate();" class="btn btn-default" style="display: inline-block;" id="todayButton">
+						<a onclick="gotoDate();" class="btn btn-default" style="display: inline-block;" id="todayButton">
 							<span class="hidden-xs">Today</span>
 							<span class="visible-xs"><span class="glyphicon glyphicon-arrow-up"></span></span>
 						</a>
-						<a href="javascript:gotoDate(dateNextFrom, dateNextTo);" class="btn btn-primary" style="display: inline-block;" id="nextButton">
+						<a onclick="gotoDate(dateNextFrom, dateNextTo);" class="btn btn-primary" style="display: inline-block;" id="nextButton">
 							<span class="hidden-xs">Next</span>
 							<span class="visible-xs"><span class="glyphicon glyphicon-arrow-right"></span></span>
 						</a>
@@ -112,13 +112,13 @@ if(isset($_GET['trackerID']) && $_GET['trackerID'] != '' && strlen($_GET['tracke
 			  <div class="well">
 			  	<div class="row">
 			  		<div class="col-xs-2 text-left">
-					  	<a href="javascript:showHideMarkers();" class="btn btn-default" id="show_markers">
+					  	<a onclick="showHideMarkers();" class="btn btn-default" id="show_markers">
 							<span class="hidden-xs">Show markers</span>
 							<span class="visible-xs"><span class="glyphicon glyphicon-map-marker"></span></span>
 						</a>
 					</div>
 					<div class="col-xs-2 text-left">
-					  	<a href="javascript:setLiveMap();" class="btn btn-default" id="livemap_on">
+					  	<a onclick="setLiveMap();" class="btn btn-default" id="livemap_on">
 							<span class="hidden-xs">Live map</span>
 							<span class="visible-xs"><span class="glyphicon glyphicon-play-circle"></span></span>
 						</a>
