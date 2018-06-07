@@ -25,7 +25,7 @@ That's it !
 ### Installation instructions
 #### PHP Client
 1. Download the source code and copy the content of the directory to your prefered location
-2. Edit the ```config.inc.sample.php``` file to setup access to your database and rename to ```config.inc.php``` :
+2. Edit the `config.inc.sample.php` file to setup access to your database and rename to `config.inc.php` :
 ```php
 	$_config['sql_host']          // sql server hostname
 	$_config['sql_user']          // sql server username
@@ -40,6 +40,10 @@ That's it !
 	$_config['geo_reverse_lookup_url'] // geodecoding api url, will be appended with lat= & lon= attributes 
 ```
 3. Create datatable using schema.sql (in the 'sql' directory)
+4. Install dependencies using [bower](https://bower.io/):
+```
+bower install
+```
 
 #### Owntracks app
 Follow [Owntracks Booklet](http://owntracks.org/booklet/features/settings/) to setup your Owntracks app :

@@ -1,0 +1,31 @@
+{
+  "name": "php-owntracks-recorder",
+  "description": "A simple and responsive self-hosted solution to record and map Owntracks http payloads.",
+  "main": "index.php",
+  "authors": [
+    "tomyvi <tomyvi@protonmail.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "owntracks"
+  ],
+  "homepage": "https://github.com/tomyvi/php-owntracks-recorder",
+  "private": true,
+  "dependencies": {
+    "jQuery": "^3.1.1",
+    "bootstrap": "^3.3.7",
+    "bootstrap-datepicker": "^1.6.4",
+    "js-cookie": "^2.1.3",
+    "leaflet": "^1.0.3",
+    "leaflet-hotline": "https://github.com/iosphere/Leaflet.hotline.git#v0.4.0",
+    "leaflet-awesome-markers": "^2.0.1",
+    "moment": "^2.9.0"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
