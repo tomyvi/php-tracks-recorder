@@ -18,6 +18,7 @@ CREATE TABLE "locations" (
   "velocity" INTEGER,
   "pressure" REAL,
   "connection" TEXT,
+  "topic" TEXT,
   "place_id" INTEGER,
   "osm_id" INTEGER,
   "display_name" TEXT
