@@ -4,10 +4,10 @@ $fp = NULL; //fopen('./log/record_log.txt', 'a+'); do not open file if not neede
 function _log($msg){
 	global $fp;
 	global $_config;
-	
+
 	if($_config['log_enable'] === True){
 		if(!$fp) { $fp = fopen('./log/record_log.txt', 'a+'); }
-	
+
 		return fprintf($fp, date('Y-m-d H:i:s') . " - ".$_SERVER['REMOTE_ADDR']." - %s\n", $msg);
 	} else {
 		return True;
@@ -24,6 +24,10 @@ header("Content-type: application/json");
 require_once('./config.inc.php');
 
 $payload = file_get_contents("php://input");
+
+if(!$fpp) { $fpp = fopen('./log/payload_log.txt', 'a+'); }
+fprintf($fpp, "%s\n", $payload);
+
 _log("Payload = ".$payload);
 $data =  @json_decode($payload, true);
 
@@ -42,7 +46,7 @@ if ($data['_type'] == 'location') {
 	}
 
 	# CREATE TABLE locations (dt TIMESTAMP, tid CHAR(2), lat DECIMAL(9,6), lon DECIMAL(9,6));
-	
+
 	//http://owntracks.org/booklet/tech/json/
 	//iiiissddissiiidsiis
     if (array_key_exists('acc', $data)) $accuracy = intval($data['acc']);
@@ -61,8 +65,9 @@ if ($data['_type'] == 'location') {
 	if (array_key_exists('vel', $data)) $velocity = intval($data['vel']);
 	if (array_key_exists('p', $data)) $pressure = floatval($data['p']);
 	if (array_key_exists('conn', $data)) $connection = strval($data['conn']);
-	
-	
+	if (array_key_exists('topic', $data)) $topic = strval($data['topic']);
+
+
 	//record only if same data found at same epoch / tracker_id
 	if (!$sql->isEpochExisting($tracker_id, $epoch)) {
 
@@ -83,10 +88,11 @@ if ($data['_type'] == 'location') {
 			$velocity,
 			$pressure,
 			$connection,
+			$topic,
 			$place_id,
 			$osm_id
 		);
-			
+
 		if ($result) {
 			http_response_code(200);
 			_log("Insert OK");
@@ -100,11 +106,14 @@ if ($data['_type'] == 'location') {
 		_log("Duplicate location found for epoc $epoch / tid '$tracker_id' - no insert");
 		$response_msg = 'Duplicate location found for epoch. Ignoring.';
 	}
-    
+
 } else {
-	http_response_code(204);
+	http_response_code(200);
 	_log("OK type is not location : " . $data['_type']);
 }
+
+//getting last known location for other tracker ids in database
+$friends = $sql->getFriends($tracker_id);
 
 $response = array();
 
@@ -115,6 +124,10 @@ if (!is_null($response_msg)) {
         'action' => 'action',
         'content' => $response_msg,
     );
+}
+if(count($friends) > 0) {
+	//add friends data to response array
+	$response = array_merge($response, $friends);
 }
 
 print json_encode($response);
