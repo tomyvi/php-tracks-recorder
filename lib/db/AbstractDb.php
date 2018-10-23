@@ -39,15 +39,47 @@ class AbstractDb
         int $velocity = null,
         float $pressure = null,
         string $connection = null,
+        string $topic = null,
         int $place_id = null,
         int $osm_id = null
     ): bool {
-        $sql = 'INSERT INTO ' . $this->prefix . 'locations (accuracy, altitude, battery_level, heading, description, event, latitude, longitude, radius, trig, tracker_id, epoch, vertical_accuracy, velocity, pressure, connection, place_id, osm_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        $params = array($accuracy, $altitude, $battery_level, $heading, $description, $event, $latitude, $longitude, $radius, $trig, $tracker_id, $epoch, $vertical_accuracy, $velocity, $pressure, $connection, $place_id, $osm_id);
+        $sql = 'INSERT INTO ' . $this->prefix . 'locations (accuracy, altitude, battery_level, heading, description, event, latitude, longitude, radius, trig, tracker_id, epoch, vertical_accuracy, velocity, pressure, connection, topic, place_id, osm_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        $params = array($accuracy, $altitude, $battery_level, $heading, $description, $event, $latitude, $longitude, $radius, $trig, $tracker_id, $epoch, $vertical_accuracy, $velocity, $pressure, $connection, $topic, $place_id, $osm_id);
         $result = $this->execute($sql, $params);
         return $result;
     }
- 
+
+    public function getFriends(string $trackerId): array
+    {
+        $sql = "select * from ".$_config['sql_prefix']."locations a JOIN (SELECT MAX(epoch) AS epoch, tracker_id FROM ' . $this->prefix . 'locations WHERE tracker_id != ? GROUP BY tracker_id) b ON a.epoch = b.epoch AND a.tracker_id = b.tracker_id";
+        $sql = 'SELECT * FROM ' . $this->prefix . 'locations WHERE epoch >= ? AND epoch <= ? AND accuracy < ? AND altitude >=0 ORDER BY tracker_id, epoch ASC';
+        $result = $this->query($sql, array($trackerId));
+
+
+        $friends = array();
+
+        foreach ($result as $data) {
+            $friend = array();
+
+            $friend['_type'] = 'location';
+            $friend['tst'] = $data['epoch'];
+            $friend['tid'] = $data['tracker_id'];
+            $friend['lat'] = floatval($data['latitude']);
+            $friend['lon'] = floatval($data['longitude']);
+            $friend['acc'] = $data['accuracy'];
+            $friend['alt'] = $data['altitude'];
+            $friend['vac'] = $data['vertical_accuracy'];
+            $friend['cog'] = $data['heading'];
+            $friend['vel'] = $data['velocity'];
+            $friend['rad'] = $data['radius'];
+            $friend['topic'] = $data['topic'];
+
+            $friends[] = $friend;
+        }
+
+        return $friends;
+    }
+
     public function getMarkers(int $time_from, int $time_to, int $min_accuracy = 1000): array
     {
         $sql = 'SELECT * FROM ' . $this->prefix . 'locations WHERE epoch >= ? AND epoch <= ? AND accuracy < ? AND altitude >=0 ORDER BY tracker_id, epoch ASC';
