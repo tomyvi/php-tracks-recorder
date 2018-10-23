@@ -15,11 +15,18 @@ class AbstractDb
         // Run query and fetch results
     }
 
-    public function isEpochExisting(string $trackerId, int $epoch): bool
+    public function isBetterRecordExisting(string $trackerId, int $epoch, int $accuracy): bool
     {
-        $sql = 'SELECT epoch FROM ' . $this->prefix . 'locations WHERE tracker_id = ? AND epoch = ?';
+        $sql = 'SELECT accuracy FROM ' . $this->prefix . 'locations WHERE tracker_id = ? AND epoch = ?';
         $result = $this->query($sql, array($trackerId, $epoch));
-        return (count($result) > 0);
+
+        $already_better_accuracy = false;
+
+        foreach ($result as $data) {
+            if($data['accuracy'] < $accuracy) $already_better_accuracy = true;
+        }
+
+        return ((count($result) > 0) || $already_better_accuracy);
     }
 
     public function addLocation(
