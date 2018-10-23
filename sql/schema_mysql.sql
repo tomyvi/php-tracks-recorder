@@ -16,6 +16,7 @@ CREATE TABLE `locations` (
   `velocity` int(11) DEFAULT NULL,
   `pressure` decimal(9,6) DEFAULT NULL,
   `connection` varchar(1) DEFAULT NULL,
+  `topic` varchar(255) DEFAULT NULL,
   `place_id` int(11) DEFAULT NULL,
   `osm_id` int(11) DEFAULT NULL,
   `display_name` text
