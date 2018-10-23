@@ -68,8 +68,8 @@ if ($data['_type'] == 'location') {
 	if (array_key_exists('topic', $data)) $topic = strval($data['topic']);
 
 
-	//record only if same data found at same epoch / tracker_id
-	if (!$sql->isEpochExisting($tracker_id, $epoch)) {
+	//record only if same data not found at same epoch / tracker_id or with already better accuracy
+	if (!$sql->isBetterRecordExisting($tracker_id, $epoch, $accuracy)) {
 
 		$result = $sql->addLocation(
 			$accuracy,
