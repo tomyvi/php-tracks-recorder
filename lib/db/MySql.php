@@ -48,7 +48,7 @@ class MySql extends AbstractDb
             return false;
         }
         $dbresult = $stmt->get_result();
-        
+
         $result = array();
         while ($data = $dbresult->fetch_assoc()) {
             // Loop through results here $data[]

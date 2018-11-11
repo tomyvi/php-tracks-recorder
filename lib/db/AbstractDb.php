@@ -1,19 +1,15 @@
 <?php
 
-class AbstractDb
+abstract class AbstractDb
 {
     protected $db;
     protected $prefix;
 
-    protected function execute(string $sql, array $params): bool
-    {
-        // Run query without result
-    }
+    // Run query without result
+    abstract protected function execute(string $sql, array $params): bool;
 
-    protected function query(string $sql, array $params): array
-    {
-        // Run query and fetch results
-    }
+    //// Run query and fetch results
+    abstract protected function query(string $sql, array $params): array;
 
     public function isBetterRecordExisting(string $trackerId, int $epoch, int $accuracy): bool
     {
@@ -29,29 +25,9 @@ class AbstractDb
         return ((count($result) > 0) || $already_better_accuracy);
     }
 
-    public function addLocation(
-        int $accuracy = null,
-        int $altitude = null,
-        int $battery_level = null,
-        int $heading = null,
-        string $description = null,
-        string $event = null,
-        float $latitude,
-        float $longitude,
-        int $radius = null,
-        string $trig = null,
-        string $tracker_id = null,
-        int $epoch,
-        int $vertical_accuracy = null,
-        int $velocity = null,
-        float $pressure = null,
-        string $connection = null,
-        string $topic = null,
-        int $place_id = null,
-        int $osm_id = null
-    ): bool {
+    public function addRecord(SQLStructure $sql_record): bool {
         $sql = 'INSERT INTO ' . $this->prefix . 'locations (accuracy, altitude, battery_level, heading, description, event, latitude, longitude, radius, trig, tracker_id, epoch, vertical_accuracy, velocity, pressure, connection, topic, place_id, osm_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        $params = array($accuracy, $altitude, $battery_level, $heading, $description, $event, $latitude, $longitude, $radius, $trig, $tracker_id, $epoch, $vertical_accuracy, $velocity, $pressure, $connection, $topic, $place_id, $osm_id);
+        $params = array($sql_record->accuracy, $sql_record->altitude, $sql_record->battery_level, $sql_record->heading, $sql_record->description, $sql_record->event, $sql_record->latitude, $sql_record->longitude, $sql_record->radius, $sql_record->trig, $sql_record->tracker_id, $sql_record->epoch, $sql_record->vertical_accuracy, $sql_record->velocity, $sql_record->pressure, $sql_record->connection, $sql_record->topic, $sql_record->place_id, $sql_record->osm_id);
         $result = $this->execute($sql, $params);
         return $result;
     }
