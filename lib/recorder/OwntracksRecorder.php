@@ -28,7 +28,7 @@ class OwntracksRecordStructure extends AbstractRecordStructure {
 class OwntracksRecorder extends AbstractRecorder
 {
 
-  public function getTrackerID(object $rec): int
+  public function getTrackerID(AbstractRecordStructure $rec): int
   {
     return strval($rec->tid);
   }
@@ -84,7 +84,7 @@ class OwntracksRecorder extends AbstractRecorder
 
   }
 
-  public function formatRecordToSQLStructure(object $record_struct): object
+  public function formatRecordToSQLStructure(AbstractRecordStructure $record_struct): SQLStructure
   {
     $sqlRecord = new SQLStructure();
 
@@ -109,7 +109,7 @@ class OwntracksRecorder extends AbstractRecorder
     return $sqlRecord;
   }
 
-  public function getFriendsLocation(object $record_struct): array
+  public function getFriendsLocation(AbstractRecordStructure $record_struct): array
   {
     return $sql->getFriends($record_struct->getTrackerID());
   }
@@ -117,7 +117,7 @@ class OwntracksRecorder extends AbstractRecorder
   public function buildResponseArray(string $response_msg, int $response_code): array
   {
     $response = array();
-    
+
     if (!is_null($response_msg)) {
         // Add status message to return object (to be shown in app)
         $response[] = array(

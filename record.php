@@ -45,16 +45,19 @@ try{
 	$records = $recorder->parsePayload($payload);
 
 	foreach($records as $rec){
-		if ($recorder->saveRecord($rec)) {
+		try {
+			$recorder->saveRecord($rec, $sql);
 			$http_response_code = 200;
 			$response_msg = 'Record saved to database';
 			_log("Insert OK");
-		} else {
 
-			_log("Insert KO - Can't write to database.");
-			$http_response_code = 500;
-			$response_msg = 'Can\'t write to database';
+		} catch (\Exception $e) {
+			$http_response_code = $e->getCode();
+			$response_msg = "Can't write to database : " . $e->getMessage();
+			_log("Insert KO - " . $response_msg);
+
 		}
+
 	}
 }
 catch(Exception $e){
@@ -67,7 +70,7 @@ catch(Exception $e){
 
 //getting last known location for other tracker ids in database
 $friends = array();
-if(count($records)>0) $friends = $recorder->getFriends($records[0]);
+if(count($records)>0) $friends = $recorder->getFriendsLocation($records[0]);
 
 $response = $recorder->buildResponseArray($response_msg, $http_response_code);
 

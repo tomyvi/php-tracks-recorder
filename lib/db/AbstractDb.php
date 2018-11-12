@@ -26,9 +26,35 @@ abstract class AbstractDb
     }
 
     public function addRecord(SQLStructure $sql_record): bool {
-        $sql = 'INSERT INTO ' . $this->prefix . 'locations (accuracy, altitude, battery_level, heading, description, event, latitude, longitude, radius, trig, tracker_id, epoch, vertical_accuracy, velocity, pressure, connection, topic, place_id, osm_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        $params = array($sql_record->accuracy, $sql_record->altitude, $sql_record->battery_level, $sql_record->heading, $sql_record->description, $sql_record->event, $sql_record->latitude, $sql_record->longitude, $sql_record->radius, $sql_record->trig, $sql_record->tracker_id, $sql_record->epoch, $sql_record->vertical_accuracy, $sql_record->velocity, $sql_record->pressure, $sql_record->connection, $sql_record->topic, $sql_record->place_id, $sql_record->osm_id);
+        $sql = 'INSERT INTO ' . $this->prefix . 'locations (accuracy, altitude, battery_level, heading, description, event, latitude, longitude, radius, trig, tracker_id, epoch, vertical_accuracy, velocity, pressure, connection, topic, place_id, osm_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        $params = array(
+            $sql_record->accuracy,
+            $sql_record->altitude,
+            $sql_record->battery_level,
+            $sql_record->heading,
+            $sql_record->description,
+            $sql_record->event,
+            $sql_record->latitude,
+            $sql_record->longitude,
+            $sql_record->radius,
+            $sql_record->trig,
+            $sql_record->tracker_id,
+            $sql_record->epoch,
+            $sql_record->vertical_accuracy,
+            $sql_record->velocity,
+            $sql_record->pressure,
+            $sql_record->connection,
+            $sql_record->topic,
+            $sql_record->place_id,
+            $sql_record->osm_id);
+
         $result = $this->execute($sql, $params);
+
+        if(!$result){
+          throw new \Exception("Error adding Record " . $this->db->error, 500);
+
+        }
+
         return $result;
     }
 

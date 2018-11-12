@@ -22,7 +22,7 @@ class OverlandRecordStructure extends AbstractRecordStructure {
 class OverlandRecorder extends AbstractRecorder
 {
 
-  public function getTrackerID(object $rec): int
+  public function getTrackerID(AbstractRecordStructure $rec): int
   {
     return strval($rec->device_id);
   }
@@ -43,18 +43,22 @@ class OverlandRecorder extends AbstractRecorder
 
           $rec = new OverlandRecordStructure();
 
-          $rec->timestamp = strval($data['properties']['timestamp']);
-          $rec->altitude = intval($data['properties']['altitude']);
-          $rec->speed = intval($data['properties']['speed']);
-          $rec->horizontal_accuracy = intval($data['properties']['horizontal_accuracy']);
-          $rec->vertical_accuracy = intval($data['properties']['vertical_accuracy']);
-          $rec->motion = $data['properties']['motion'];
-          $rec->battery_state = strval($data['properties']['battery_state']);
-          $rec->battery_level = floatval($data['properties']['battery_level']);
-          $rec->wifi = strval($data['properties']['wifi']);
-          $rec->device_id = strval($data['properties']['device_id']);
-          $rec->latitude = floatval($data['geometry']['coordinates'][0]);
-          $rec->longitude = floatval($data['geometry']['coordinates'][1]);
+          $rec->timestamp = strval($loc['properties']['timestamp']);
+          $rec->altitude = max(0, intval($loc['properties']['altitude']));
+          $rec->speed = max(0, intval($loc['properties']['speed']));
+          $rec->horizontal_accuracy = max(0, intval($loc['properties']['horizontal_accuracy']));
+          $rec->vertical_accuracy = max(0, intval($loc['properties']['vertical_accuracy']));
+          $rec->battery_state = strval($loc['properties']['battery_state']);
+          $rec->battery_level = floatval($loc['properties']['battery_level']);
+          $rec->wifi = strval($loc['properties']['wifi']);
+          $rec->device_id = strval($loc['properties']['device_id']);
+          $rec->latitude = floatval($loc['geometry']['coordinates'][0]);
+          $rec->longitude = floatval($loc['geometry']['coordinates'][1]);
+
+          //if(is_array($data['properties']['motion']){
+          //  $rec->motion = $data['properties']['motion'];
+          //}
+_log("new record : ".json_encode($rec));
 
           $records[] = $rec;
         }
@@ -77,14 +81,13 @@ class OverlandRecorder extends AbstractRecorder
 
   }
 
-  public function formatRecordToSQLStructure(object $record_struct): object
+  public function formatRecordToSQLStructure(AbstractRecordStructure $record_struct): SQLStructure
   {
     $sqlRecord = new SQLStructure();
 
     $sqlRecord->accuracy = intval($record_struct->horizontal_accuracy);
     $sqlRecord->altitude = intval($record_struct->altitude);
     $sqlRecord->battery_level = intval($record_struct->battery_level * 100);
-    $sqlRecord->description = implode(", ", $record_struct->motion);
     $sqlRecord->latitude = floatval($record_struct->latitude);
     $sqlRecord->longitude = floatval($record_struct->longitude);
     $sqlRecord->tracker_id = strval($record_struct->device_id);
@@ -92,20 +95,28 @@ class OverlandRecorder extends AbstractRecorder
     $sqlRecord->velocity = ($record_struct->speed)*3.6; // m/s to km/h
     if($record_struct->wifi != '') $sqlRecord->connection = 'w';
 
+    //if(is_array($record_struct->motion)){
+    //  $sqlRecord->description = implode(", ", $record_struct->motion);
+    //}
+
+
+
     $d = new DateTime($record_struct->timestamp);
     $sqlRecord->epoch = $d->format('U');
 
     return $sqlRecord;
   }
 
-  public function getFriendsLocation(object $record_struct): array
+  public function getFriendsLocation(AbstractRecordStructure $record_struct): array
   {
     // friends feature not implemented in Overland iOS app
-    return array();
+    $friends = array();
+    return $friends;
   }
 
   public function buildResponseArray(string $response_msg, int $response_code): array
   {
+    $response = array();
     if($response_code != 500) $response['result'] = 'ok';
     return $response;
   }
