@@ -52,8 +52,8 @@ class OverlandRecorder extends AbstractRecorder
           $rec->battery_level = floatval($loc['properties']['battery_level']);
           $rec->wifi = strval($loc['properties']['wifi']);
           $rec->device_id = strval($loc['properties']['device_id']);
-          $rec->latitude = floatval($loc['geometry']['coordinates'][0]);
-          $rec->longitude = floatval($loc['geometry']['coordinates'][1]);
+          $rec->latitude = floatval($loc['geometry']['coordinates'][1]);
+          $rec->longitude = floatval($loc['geometry']['coordinates'][0]);
 
           //if(is_array($data['properties']['motion']){
           //  $rec->motion = $data['properties']['motion'];
