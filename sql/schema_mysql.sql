@@ -1,5 +1,5 @@
 CREATE TABLE `locations` (
-  `dt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `dt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `accuracy` int(11) DEFAULT NULL,
   `altitude` int(11) DEFAULT NULL,
   `battery_level` int(11) DEFAULT NULL,
@@ -10,14 +10,16 @@ CREATE TABLE `locations` (
   `longitude` decimal(9,6) DEFAULT NULL,
   `radius` int(11) DEFAULT NULL,
   `trig` varchar(1) DEFAULT NULL,
-  `tracker_id` char(2) DEFAULT NULL,
+  `tracker_id` varchar(255) DEFAULT NULL,
   `epoch` int(11) DEFAULT NULL,
   `vertical_accuracy` int(11) DEFAULT NULL,
-  `velocity` int(11) DEFAULT NULL,
+  `velocity` float DEFAULT NULL,
   `pressure` decimal(9,6) DEFAULT NULL,
   `connection` varchar(1) DEFAULT NULL,
-  `topic` varchar(255) DEFAULT NULL,
+  `topic` varchar(255) NOT NULL,
   `place_id` int(11) DEFAULT NULL,
   `osm_id` int(11) DEFAULT NULL,
-  `display_name` text
+  `display_name` text DEFAULT NULL,
+  KEY `accuracy_index` (`accuracy`),
+  KEY `tracker_id` (`tracker_id`,`epoch`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
