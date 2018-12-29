@@ -13,6 +13,7 @@ abstract class AbstractDb
 
     public function isBetterRecordExisting(string $trackerId, int $epoch, int $accuracy): bool
     {
+
         $sql = 'SELECT accuracy FROM ' . $this->prefix . 'locations WHERE tracker_id = ? AND epoch = ?';
         $result = $this->query($sql, array($trackerId, $epoch));
 
@@ -23,6 +24,7 @@ abstract class AbstractDb
         }
 
         return ((count($result) > 0) || $already_better_accuracy);
+        
     }
 
     public function addRecord(SQLStructure $sql_record): bool {

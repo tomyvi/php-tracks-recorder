@@ -58,7 +58,6 @@ class OverlandRecorder extends AbstractRecorder
           //if(is_array($data['properties']['motion']){
           //  $rec->motion = $data['properties']['motion'];
           //}
-_log("new record : ".json_encode($rec));
 
           $records[] = $rec;
         }
