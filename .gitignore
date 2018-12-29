@@ -1,5 +1,7 @@
+batch_load.php
 config.inc.php
 owntracks.db3
+log/*
 
 # Windows image file caches
 Thumbs.db
