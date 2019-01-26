@@ -3,6 +3,9 @@ config.inc.php
 owntracks.db3
 log/*
 
+# PHPStorm folder
+.idea/
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
