@@ -23,3 +23,16 @@ CREATE TABLE "locations" (
   "osm_id" INTEGER,
   "display_name" TEXT
 );
+
+-- getMarkers / getFriends
+CREATE INDEX "idx_getmarkers" ON "locations" (
+  "epoch" DESC,
+  "accuracy",
+  "altitude"
+);
+
+-- isBetterRecordExisting
+CREATE INDEX "idx_epochexisting" ON "locations" (
+  "tracker_id",
+  "epoch" DESC
+);
