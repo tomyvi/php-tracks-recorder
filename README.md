@@ -36,7 +36,7 @@ That's it !
 	$_config['sql_db']            // database name or SQLite filename
 	$_config['sql_prefix']        // table prefix (only needed for 'mysql')
 
-	$_config['default_accuracy']  // default maxymum accuracy for location record to be displayed on the map
+	$_config['default_accuracy']  // default maximum accuracy for location record to be displayed on the map
 
 	$_config['enable_geo_reverse'] // set to TRUE to enable geo decoding of location records
 	$_config['geo_reverse_lookup_url'] // geodecoding api url, will be appended with lat= & lon= attributes
