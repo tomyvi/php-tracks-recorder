@@ -42,12 +42,11 @@ if (array_key_exists('action', $_REQUEST)) {
             $accuracy = $_config['default_accuracy'];
         }
 
-        $time_from = strptime($_GET['dateFrom'], '%Y-%m-%d');
-        $time_from = mktime(0, 0, 0, $time_from['tm_mon']+1, $time_from['tm_mday'], $time_from['tm_year']+1900);
+        $time_from = date_parse_from_format('Y-m-d', $_GET['dateFrom']);
+        $time_from = mktime(0, 0, 0, $time_from['month'], $time_from['day'], $time_from['year']);
 
-
-        $time_to = strptime($_GET['dateTo'], '%Y-%m-%d');
-        $time_to = mktime(23, 59, 59, $time_to['tm_mon']+1, $time_to['tm_mday'], $time_to['tm_year']+1900);
+        $time_to = date_parse_from_format( 'Y-m-d', $_GET['dateTo']);
+        $time_to = mktime(23, 59, 59, $time_to['month'], $time_to['day'], $time_to['year']);
         //$time_to = strtotime('+1 day', $time_to);
 
         $markers = $sql->getMarkers($time_from, $time_to, $accuracy);
