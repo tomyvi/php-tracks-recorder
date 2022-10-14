@@ -14,7 +14,7 @@ var i;
 var map_drawn = false;
 var show_markers;
 var mymap;
-var tid_markers; // markers collected from json
+var tid_markers = []; // markers collected from json
 var my_marker;
 var my_markers = [];
 var my_latlngs = [];
@@ -371,7 +371,6 @@ function drawMap(_tid_markers){
         nb_markers=0; // global markers counter
         trackerIDs = Object.keys(_tid_markers);
 
-        tid_markers = []; // markers collected from json
         my_markers = [];
         my_latlngs = [];
         polylines = [];
