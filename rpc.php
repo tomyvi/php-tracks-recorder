@@ -57,7 +57,7 @@ if (array_key_exists('action', $_REQUEST)) {
             http_response_code(500);
         } else {
             $response['status'] = true;
-            $response['markers'] = json_encode($markers);
+            $response['markers'] = $markers;
         }
 
 
