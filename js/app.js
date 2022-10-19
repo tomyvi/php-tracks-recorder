@@ -674,7 +674,7 @@ function getMarkers(){
         {
             if(data.status){
 
-                jsonMarkers = JSON.parse(data.markers);
+                jsonMarkers = data.markers;
 
                 if(handleMarkersData(jsonMarkers)){ $('#mapid').css('filter','blur(0px)'); }
 
